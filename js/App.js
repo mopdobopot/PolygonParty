@@ -66,9 +66,6 @@ $(document).ready(function() {
                 }
             }
             return false;
-        },
-        setVertex = function(v, i) {
-            this.vertexes[i] = v;
         };
 
     /* Интерфейс */
