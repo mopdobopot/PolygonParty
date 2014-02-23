@@ -1,0 +1,205 @@
+/* CSS BY MOPDOBOPOT */
+
+@import url(http://fonts.googleapis.com/css?family=PT+Serif:400,700,400italic&subset=latin,cyrillic);
+@import url(http://fonts.googleapis.com/css?family=PT+Serif+Caption:400,400italic&subset=latin,cyrillic);
+@import url(http://fonts.googleapis.com/css?family=PT+Sans:700&subset=latin,cyrillic);
+@import url(http://fonts.googleapis.com/css?family=PT+Sans+Caption:400,700&subset=latin,cyrillic);
+
+BODY {
+    margin: 0;
+    padding: 0;
+    background: #f1f1f1;
+}
+SELECT, INPUT {
+    width: 210px;
+    height: 26px;
+    padding: 2px 1px 2px 6px;
+    border: 1px solid #d6d6d6;
+    border-radius: 2px;
+    font-family: 'PT Sans Caption', sans-serif;
+}
+INPUT[type="text"] {
+    width: 221px;
+    height: 20px;
+    padding: 2px 1px 2px 6px;
+}
+INPUT[type="radio"],
+INPUT[type="checkbox"] {
+    display: block;
+    float: left;
+    width: 18px;
+    height: 18px;
+    margin: 0 4px 0 0;
+}
+INPUT[type="radio"]:focus,
+INPUT[type="checkbox"]:focus {
+    outline: none;
+}
+SELECT:focus, INPUT:focus {
+    outline: 1px solid #9d9d9d;
+}
+BUTTON {
+    height: 26px;
+    padding: 2px 10px 2px 10px;
+    border: 1px solid #d6d6d6;
+    border-radius: 2px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-family: 'PT Sans Caption', sans-serif;
+    color: #666;
+    background: #fff;
+}
+BUTTON:hover {
+    background: #f3f3f3;
+    box-shadow: inset 0 -1px 4px #dedede;
+}
+BUTTON:active {
+    border: 1px solid #d6d6d6;
+    border-bottom: 1px solid #cecece;
+    background: #ededed;
+}
+BUTTON:disabled {
+    opacity: .3;
+    cursor: default;
+    border: 1px solid #d6d6d6;
+    color: #666;
+    background: #fff;
+    box-shadow: none;
+}
+INPUT[type="number"] {
+    width: 85px;
+    height: 18px;
+}
+INPUT:disabled {
+    color: #999;
+}
+INPUT.error {
+    border-color: #e04646;
+}
+CANVAS {
+    border-bottom: 1px solid #e0e0e0;
+}
+.appWrapper {
+    width: 1200px;
+    margin: 40px auto;
+}
+.title {
+    height: 40px;
+    border-bottom: 1px solid #efefef;
+    font: bold 22px 'PT Sans Caption', sans-serif;
+    color: #333;
+}
+.app {
+    background: #fff;
+    border-radius: 3px;
+    border: 1px solid #e9e9e9;
+    border-top: 1px solid #efefef;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 30px;
+}
+.canvasBlock {
+    width: 720px;
+    height: 600px;
+    margin: 30px 0 0 30px;
+    border-radius: 2px 2px 2px 2px;
+    border: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e9e9e9;
+    float: left;
+}
+.optionsBlock {
+    width: 386px;
+    margin: 30px 0 0 30px;
+    float: left;
+}
+.option {
+    margin-top: 18px;
+}
+.option:first-child {
+    margin-top: 0;
+}
+.option.radioButton {
+    min-height: 24px;
+    margin-top: 0;
+}
+.separator {
+    height: 20px;
+    margin-top: 38px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e9e9e9;
+}
+.label, .inline-label {
+    font: 13px 'PT Sans Caption', sans-serif;
+    color: #555;
+    margin-bottom: 4px;
+    display: block;
+}
+.inline-label {
+    float: left;
+}
+.label.error {
+    color: #e04646;
+}
+.disabled {
+    display: none;
+}
+#infoTable {
+    font: 12px 'PT Serif', sans-serif;
+    margin: 510px 0 0 15px;
+    color: #333;
+}
+#infoTable td:first-child {
+    padding-right: 8px;
+    font-weight: 700;
+}
+#polygonTypeSelect {
+    width: 230px;
+}
+#saveOptionsToggle {
+    display: inline-block;
+    cursor: pointer;
+    border-bottom: 1px dotted rgba(0, 138, 206, 0.52);
+    font: 12px 'PT Sans Caption', sans-serif;
+    color: #008ACE;
+}
+
+
+/* individual option parameters */
+
+#polygonAmountOption, #vertexAmountOption {
+    margin-top: 12px;
+}
+#regularOption {
+    min-height: 14px;
+    margin-top: 12px;
+}
+#imageOption {
+    min-height: 18px;
+    margin-top: 12px;
+}
+#saveButtonOption {
+    margin: 18px 0 0 0;
+}
+#saveButton {
+    margin: 0;
+}
+#saveOptionsBlock {
+    display: none;
+}
+#oneFileOption {
+    margin-top: 18px;
+}
+#nonConvexityDegreeBlock {
+    margin-top: 18px;
+}
+#nonConvexityDegreeOption {
+    margin-top: 10px;
+}
+#csCanvas, #canvas {
+    position: absolute;
+}
+#canvas {
+    z-index: 1;
+}
+#csCanvas {
+    z-index: 0;
+}
