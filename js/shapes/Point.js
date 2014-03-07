@@ -5,6 +5,10 @@
  */
 var Point = {
 
+    arePointsEquals: function(p1, p2) {
+        return (p1.x === p2.x) && (p1.y === p2.y);
+    },
+
     genRand: function(min, max) {
         if (min > max) {
             throw new Error("Неверный диапазон для генерации точки: [" + min + ".." + max + ")");
@@ -18,4 +22,4 @@ var Point = {
         }
     }
 
-}
+};

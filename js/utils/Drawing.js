@@ -118,7 +118,5 @@ var Drawing = (function() {
                 drawPointNumber(context, vertexes[l - 1], l - 1);
             }
         }
-
     }
-
 })();
