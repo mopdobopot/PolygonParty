@@ -119,22 +119,25 @@ var Geometry = (function() {
         isBeamIntersectsSegment: function(line, p, segA, segB) {
             var intersection = this.getLinesIntersection(line, this.makeLine(segA, segB));
             if ((segA.y > segB.y && Point.arePointsEquals(intersection, segA)) ||
-                (segB.y > segA && Point.arePointsEquals(intersection, segB))) {
+                (segB.y > segA.y && Point.arePointsEquals(intersection, segB))) {
                 return false;
             }
             return this.isPointOnSegment(intersection, segA, segB) && (intersection.x >= p.x);
         },
 
         isPointInPolygon: function(p, vertexes) {
-            var beanLine = {a: 0, b: 1, c: -p.y},
+            var beamLine = {a: 0, b: 1, c: -p.y},
                 intersections = 0,
                 length = vertexes.length;
             for (var i = 0; i < length - 1; i++) {
-                if (this.isBeamIntersectsSegment(beanLine, p, vertexes[i], vertexes[i + 1])) {
+                if (this.isPointOnSegment(p, vertexes[i], vertexes[i+1])) {
+                    return true;
+                }
+                if (this.isBeamIntersectsSegment(beamLine, p, vertexes[i], vertexes[i + 1])) {
                     intersections++;
                 }
             }
-            if (this.isBeamIntersectsSegment(beanLine, p, vertexes[length - 1], vertexes[0])) {
+            if (this.isBeamIntersectsSegment(beamLine, p, vertexes[length - 1], vertexes[0])) {
                 intersections++;
             }
             return intersections % 2;

@@ -233,6 +233,30 @@ var Test = (function() {
             if (!Geometry.isPointInPolygon(p, vertexes)) {
                 success = false;
             }
+            p = {x: -2, y: 2};
+            if (Geometry.isPointInPolygon(p, vertexes)) {
+                success = false;
+            }
+            p = {x: -0.1, y: 2};
+            if (Geometry.isPointInPolygon(p, vertexes)) {
+                success = false;
+            }
+            p = {x: -3, y: -1};
+            if (Geometry.isPointInPolygon(p, vertexes)) {
+                success = false;
+            }
+            p = {x: -1.99, y: 0};
+            if (!Geometry.isPointInPolygon(p, vertexes)) {
+                success = false;
+            }
+            p = {x: -2, y: 0};
+            if (!Geometry.isPointInPolygon(p, vertexes)) {
+                success = false;
+            }
+            p = {x: -100, y: 0};
+            if (Geometry.isPointInPolygon(p, vertexes)) {
+                success = false;
+            }
             return logResult(success);
         }
     }
