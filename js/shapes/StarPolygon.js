@@ -39,7 +39,7 @@ var StarPolygon = (function() {
                 v1 = Geometry.makeVector(p2, p1),
                 v2 = Geometry.makeVector(p2, p3),
                 alpha = Geometry.calcAlpha(v1, v2);
-            if (alpha < phi - 0.01) {
+            if (alpha < phi - Config.stretchingAccuracy) {
                 console.log("-------");
                 console.log(j);
                 console.log(alpha);
@@ -67,13 +67,13 @@ var StarPolygon = (function() {
 
         stretchVertex = function(p1, p2, p3, phi) {
             var p1p3 = Geometry.makeVector(p1, p3),
-                p1p3_center = shiftPoint(p1, Geometry.multiplyVectorOnScalar(p1p3, 0.5)),
+                p1p3_center = shiftPoint(p1, Geometry.mulVectorOnScalar(p1p3, 0.5)),
                 guide = Geometry.makeVector(p2, p1p3_center),
                 v1 = Geometry.makeVector(p2, p1),
                 v2 = Geometry.makeVector(p2, p3),
                 alpha = Geometry.calcAlpha(v1, v2);
             while (alpha < phi - 0.01) {
-                p2 = shiftPoint(p2, Geometry.multiplyVectorOnScalar(guide, 0.5));
+                p2 = shiftPoint(p2, Geometry.mulVectorOnScalar(guide, 0.5));
                 guide = Geometry.makeVector(p2, p1p3_center);
                 v1 = Geometry.makeVector(p2, p1);
                 v2 = Geometry.makeVector(p2, p3);

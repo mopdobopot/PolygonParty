@@ -13,5 +13,7 @@ var Config = {
     animatedDrawing: false,
     animatedDrawingSpeed: 100,
     vertexRadius: 2.1,
-    clickedVertexRadius: 1.6
+    clickedVertexRadius: 1.6,
+
+    stretchingAccuracy: 0.000000001
 };
