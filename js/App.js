@@ -269,6 +269,12 @@ $(document).ready(function() {
         generateAndDrawPolygon();
     });
 
+    $(document).keydown(function(e) {
+        if (e.keyCode === 13) {
+            generateAndDrawPolygon();
+        }
+    });
+
     var generateAndDrawPolygon = function() {
 
         var infoObject = {},
