@@ -18,13 +18,10 @@ var Triangle = (function() {
     return {
 
         genRand: function(size) {
-
             this.dropVertexes();
-
             this.addVertex({x: 0, y: 0});
             var a = Math.random() * size,
                 b = Math.random() * size;
-
             generateType();
             if (equi) {
                 this.addVertex({x: a, y: 0});
@@ -61,24 +58,7 @@ var Triangle = (function() {
             this.rotate(Math.random() * Math.PI);
             this.center(width, height);
             Drawing.drawPolygon(this.vertexes, context, width, height, isVertexNumberNeeded);
-        },
-
-        getPerimeter: function() {
-            return Geometry.getTrianglePerimeter(
-                this.vertexes[0],
-                this.vertexes[1],
-                this.vertexes[2]
-            );
-        },
-
-        getSquare: function() {
-            return Geometry.getTriangleSquare(
-                this.vertexes[0],
-                this.vertexes[1],
-                this.vertexes[2]
-            );
         }
-
     }
 })();
 

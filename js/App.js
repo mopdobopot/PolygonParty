@@ -23,7 +23,7 @@ $(document).ready(function() {
 
     var clickedVertex,
         clone = function(obj) {
-            return $.extend(true, {}, obj); // Глубокое клонирование
+            return $.extend(true, {}, obj); //Глубокое клонирование
         };
 
     $canvas.mousedown(function(e) {
@@ -34,6 +34,8 @@ $(document).ready(function() {
             clickedVertex = clone(currentVertexes[i]);
             clickedVertex.index = i;
             Drawing.drawPolygon(currentVertexes, context, w, h, isChecked(checkbox_showVertexNumbers));
+            currentPolygon.vertexes = currentVertexes;
+            createInfoTable(currentPolygon);
         }
     });
     $canvas.mouseup(function() {
@@ -42,6 +44,8 @@ $(document).ready(function() {
         }
         clickedVertex = undefined;
         Drawing.drawPolygon(currentVertexes, context, w, h, isChecked(checkbox_showVertexNumbers));
+        currentPolygon.vertexes = currentVertexes;
+        createInfoTable(currentPolygon);
     });
     $canvas.mousemove(function(e) {
         if (clickedVertex) {
@@ -49,6 +53,8 @@ $(document).ready(function() {
             clickedVertex.y = e.offsetY;
             currentVertexes[clickedVertex.index] = clone(clickedVertex);
             Drawing.drawPolygon(currentVertexes, context, w, h, isChecked(checkbox_showVertexNumbers));
+            currentPolygon.vertexes = currentVertexes;
+            createInfoTable(currentPolygon);
         }
         else {
             var i = tryToFindVertex({x: e.offsetX, y: e.offsetY}, currentVertexes);
@@ -69,6 +75,9 @@ $(document).ready(function() {
         };
 
     /* Интерфейс */
+
+    var convexPolygonName = "Выпуклый многоугольник",
+        starPolygonName = "Звёздный многоугольник";
 
     // Общие методы ----------------------------------------------------------------------------------------------------|
 
@@ -107,23 +116,24 @@ $(document).ready(function() {
     // Тип многоугольника ----------------------------------------------------------------------------------------------|
 
     var select_polygonType = $('select#polygonTypeSelect'),
-        polygonType = "Выпуклый многоугольник",
+        polygonType = convexPolygonName,
         button_generate = $('#generateButton'),
         button_save = $('#saveButton'),
+        currentPolygon,
         currentVertexes = [];
 
     select_polygonType.change(function() {
         polygonType = $(this).val();
         Drawing.clearCanvas(context, w, h);
         switch (polygonType) {
-            case "Выпуклый многоугольник":
+            case convexPolygonName:
                 enable(div_regular);
                 disable(div_nonConvexityDegreeBlock);
                 if (input_vertexAmount.val() == 4 && !isChecked(checkbox_regular)) {
                     enable(div_rectangleTypes);
                 }
                 break;
-            case "Звёздчатый многоугольник":
+            case starPolygonName:
                 disable(div_regular);
                 disable(div_rectangleTypes);
                 enable(div_nonConvexityDegreeBlock);
@@ -183,32 +193,29 @@ $(document).ready(function() {
     input_vertexAmount.keyup(function() {
         vertexAmountChangeHandler(input_vertexAmount.val());
     });
-
     input_vertexAmount.change(function() {
         vertexAmountChangeHandler(input_vertexAmount.val());
     });
-
     var vertexAmountChangeHandler = function(value) {
-        if (value < 3 || value == "") {
-            disableButtons();
-            error(div_vertexAmount);
-            vertexAmountError = true;
-        }
-        else if (value == 4 && polygonType == "Выпуклый многоугольник") {
-            if (!isChecked(checkbox_regular)) {
-                enable(div_rectangleTypes);
+            if (value < 3 || value == "") {
+                disableButtons();
+                error(div_vertexAmount);
+                vertexAmountError = true;
             }
-            checkRadioButton(radioButton_randomRectangle);
-        }
-        else {
-            disable(div_rectangleTypes);
-            enableButtons();
-            unError(div_vertexAmount);
-            vertexAmountError = false;
-        }
-    };
-
-    var enableButtons = function() {
+            else if (value == 4 && polygonType == convexPolygonName) {
+                if (!isChecked(checkbox_regular)) {
+                    enable(div_rectangleTypes);
+                }
+                checkRadioButton(radioButton_randomRectangle);
+            }
+            else {
+                disable(div_rectangleTypes);
+                enableButtons();
+                unError(div_vertexAmount);
+                vertexAmountError = false;
+            }
+        },
+        enableButtons = function() {
             enableButton(button_generate);
             enableButton(button_save);
         },
@@ -246,7 +253,6 @@ $(document).ready(function() {
     input_nonConvexityDegree.change(function() {
         nonConvexityDegreeChangeHandler(input_nonConvexityDegree.val());
     });
-
     var nonConvexityDegreeChangeHandler = function(value) {
         if (value < 0 || value > 180 || value == "") {
             disableButtons();
@@ -268,7 +274,6 @@ $(document).ready(function() {
     button_generate.click(function() {
         generateAndDrawPolygon();
     });
-
     $(document).keydown(function(e) {
         if (e.keyCode === 13) {
             generateAndDrawPolygon();
@@ -276,26 +281,16 @@ $(document).ready(function() {
     });
 
     var generateAndDrawPolygon = function() {
-
-        var infoObject = {},
-            n = input_vertexAmount.val(),
-            type = "",
-            perimeter = 0,
-            square = 0;
-
+        var n = input_vertexAmount.val();
         switch (polygonType) {
-            case "Выпуклый многоугольник":
+            case convexPolygonName:
                 if (isChecked(checkbox_regular)) {
                     ConvexPolygon.drawRegular(context, w, h, n, h / 2, isChecked(checkbox_showVertexNumbers));
-                    type = ConvexPolygon.type;
-                    perimeter = ConvexPolygon.getPerimeter();
-                    square = ConvexPolygon.getSquare();
+                    createInfoTable(ConvexPolygon);
                 }
                 else if (n == 3) {
                     Triangle.drawRand(context, w, h, h / 2, isChecked(checkbox_showVertexNumbers));
-                    type = Triangle.type;
-                    perimeter = Triangle.getPerimeter();
-                    square = Triangle.getSquare();
+                    createInfoTable(Triangle);
                 }
                 else {
                     if (n == 4) {
@@ -312,24 +307,18 @@ $(document).ready(function() {
                     else {
                         ConvexPolygon.drawRand(context, w, h, n, h / 2, isChecked(checkbox_showVertexNumbers));
                     }
-                    type = ConvexPolygon.type;
-                    perimeter = ConvexPolygon.getPerimeter();
-                    square = ConvexPolygon.getSquare();
+                    createInfoTable(ConvexPolygon);
                 }
-                infoObject = {
-                    "Тип": type,
-                    "Периметр": perimeter,
-                    "Площадь": square
-                };
-                createInfoTable(infoObject);
                 if (n == 3) {
                     currentVertexes = Triangle.vertexes;
+                    currentPolygon = Triangle;
                 }
                 else {
                     currentVertexes = ConvexPolygon.vertexes;
+                    currentPolygon = ConvexPolygon;
                 }
                 break;
-            case "Звёздчатый многоугольник":
+            case starPolygonName:
                 if (isChecked(radioButton_definedNonConvexityDegree)) {
                     var phi = input_nonConvexityDegree.val() / 180 * Math.PI;
                     StarPolygon.drawRandStretched(context, w, h, n, h, phi, isChecked(checkbox_showVertexNumbers));
@@ -337,21 +326,25 @@ $(document).ready(function() {
                 else {
                     StarPolygon.drawRand(context, w, h, n, h, isChecked(checkbox_showVertexNumbers));
                 }
-                infoObject = {
-                    "Тип": "Случайный",
-                    "Периметр": StarPolygon.getPerimeter(),
-                    "Площадь": StarPolygon.getSquare()
-                };
-                createInfoTable(infoObject);
+                createInfoTable(StarPolygon);
                 currentVertexes = StarPolygon.vertexes;
+                currentPolygon = StarPolygon;
                 break;
         }
     };
 
-    var createInfoTable = function(object) {
-            $('#infoTable').html(infoTable(object));
+    var makeInfoObject = function(polygon) {
+            return {
+                "Тип": polygon.type,
+                "Периметр": polygon.getPerimeter(),
+                "Площадь": polygon.getSquare(),
+                "Альфа-выпуклость": 12
+            }
         },
-        infoTable = function(object) {
+        createInfoTable = function(polygon) {
+            $('#infoTable').html(toHtml(makeInfoObject(polygon)));
+        },
+        toHtml = function(object) {
             var info = "";
             for (var key in object) {
                 info += '<tr>' +

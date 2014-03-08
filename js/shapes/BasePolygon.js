@@ -6,7 +6,7 @@
 var BasePolygon = (function() {
 
     var getTrapezeSquare = function(v1, v2) {
-        return (v1.x + v2.x) * (v2.y - v1.y) / 2;
+        return (v1.y + v2.y) * (v2.x - v1.x) / 2;
     };
 
     return {
@@ -16,7 +16,7 @@ var BasePolygon = (function() {
         maxX: 0,
         minY: 0,
         maxY: 0,
-        type: "Тип ещё не был определён",
+        type: "Тип не определён",
 
         dropVertexes: function() {
             this.vertexes = [];
@@ -65,10 +65,11 @@ var BasePolygon = (function() {
         getSquare: function() {
             var s = 0,
                 l = this.vertexes.length;
-            for (var i = 0; i < l - 1; i++)
+            for (var i = 0; i < l - 1; i++) {
                 s += getTrapezeSquare(this.vertexes[i], this.vertexes[i + 1]);
+            }
             s += getTrapezeSquare(this.vertexes[l - 1], this.vertexes[0]);
-            return s;
+            return Math.abs(s);
         },
 
         centerAndDraw: function(width, height, context, isVertexNumberNeeded) {
@@ -82,5 +83,4 @@ var BasePolygon = (function() {
             Drawing.drawPolygon(this.vertexes, context, width, height, isVertexNumberNeeded);
         }
     }
-
 })();

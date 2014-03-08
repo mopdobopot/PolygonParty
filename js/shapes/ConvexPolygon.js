@@ -10,14 +10,11 @@ var ConvexPolygon = (function() {
     return {
 
         genRegular: function(n, size) {
-
             this.dropVertexes();
-
             var alpha = 2 * Math.PI / n,
                 curAlpha = 0;
                 r = Math.random() * size;
             this.addVertex({x: r, y: 0});
-
             for (var i = 1; i < n; i++) {
                 curAlpha += alpha;
                 this.addVertex({x: r * Math.cos(curAlpha), y: r * Math.sin(curAlpha)});
@@ -40,15 +37,12 @@ var ConvexPolygon = (function() {
         },
 
         genTrapeze: function(size) {
-
             this.dropVertexes();
-
             var a = Math.random() * size,
                 b = Math.random() * a,
                 c = Math.random() * b,
                 d = Math.random() * size,
                 rect = (Math.random() * 100) < 30;
-
             this.addVertex({x: 0, y: 0});
             this.addVertex({x: a, y: 0});
             if (rect) {
@@ -70,15 +64,12 @@ var ConvexPolygon = (function() {
         },
 
         genParallelogram: function(size) {
-
             this.dropVertexes();
-
             var a = Math.random() * size,
                 b = Math.random() * size,
                 rhombus = (Math.random() * 100) < 30,
                 rectangle = (Math.random() * 100) < 20,
                 square = (Math.random() * 100) < 10;
-
             if (square) {
                 this.addVertex({x: 0, y: 0});
                 this.addVertex({x: a, y: 0});
@@ -116,12 +107,9 @@ var ConvexPolygon = (function() {
         },
 
         genRandomQuadrangle: function(size) {
-
             this.dropVertexes();
-
             var trapeze = (Math.random() * 100) < 25,
                 parallelogram = (Math.random() * 100) < 25;
-
             if (trapeze) {
                 this.genTrapeze(size);
             }
@@ -139,16 +127,13 @@ var ConvexPolygon = (function() {
         },
 
         genRand: function(n, size) {
-
             this.dropVertexes();
-
             var alpha = 2 * Math.PI / n,
                 maxAlpha = alpha,
                 curAlpha = 0,
                 newAlpha;
             r = Math.random() * size;
             this.addVertex({x: r, y: 0});
-
             for (var i = 1; i < n; i++) {
                 newAlpha = Math.random() * maxAlpha;
                 curAlpha += newAlpha;
@@ -171,9 +156,7 @@ var ConvexPolygon = (function() {
         getType: function() {
             return this.type;
         }
-
     }
-
 })();
 
 ConvexPolygon.__proto__ = BasePolygon;

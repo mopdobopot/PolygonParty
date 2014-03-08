@@ -10,7 +10,6 @@ var StarPolygon = (function() {
             array[i] = array[j];
             array[j] = temp;
         },
-
         sortFunc = function(a, b) {
             if (a.alpha === b.alpha)
                 return 0;
@@ -19,7 +18,6 @@ var StarPolygon = (function() {
             else
                 return 1;
         },
-
         findAverage = function(array) {
             var size = array.length,
                 sumX = 0,
@@ -30,7 +28,6 @@ var StarPolygon = (function() {
             }
             return {x: sumX / size, y: sumY / size}
         },
-
         tryStretch = function(i, j, k, phi, vertexes) {
             var p1 = vertexes[i],
                 p2 = vertexes[j],
@@ -64,7 +61,6 @@ var StarPolygon = (function() {
                 }
             }
         },
-
         stretchVertex = function(p1, p2, p3, phi) {
             var p1p3 = Geometry.makeVector(p1, p3),
                 p1p3_center = shiftPoint(p1, Geometry.mulVectorOnScalar(p1p3, 0.5)),
@@ -72,7 +68,7 @@ var StarPolygon = (function() {
                 v1 = Geometry.makeVector(p2, p1),
                 v2 = Geometry.makeVector(p2, p3),
                 alpha = Geometry.calcAlpha(v1, v2);
-            while (alpha < phi - 0.01) {
+            while (alpha < phi - Config.stretchingAccuracy) {
                 p2 = shiftPoint(p2, Geometry.mulVectorOnScalar(guide, 0.5));
                 guide = Geometry.makeVector(p2, p1p3_center);
                 v1 = Geometry.makeVector(p2, p1);
@@ -82,60 +78,54 @@ var StarPolygon = (function() {
             console.log(alpha);
             return p2;
         },
-
         shiftPoint = function(p, v) {
             return {x: p.x + v.x, y: p.y + v.y};
-        }
+        };
+
 
     return {
 
         genRand: function(n, size) {
-
             this.dropVertexes();
-
             for (var i = 0; i < n; i++) {
                 this.addVertex(Point.genRand(0, size));
             }
-
             var e = {x: 1, y: 0},
                 starCenter = findAverage(this.vertexes),
                 curV = {};
-
-            for (var i = 0; i < n; i++) {
+            for (i = 0; i < n; i++) {
                 curV = {
                     x: this.vertexes[i].x - starCenter.x,
                     y: this.vertexes[i].y - starCenter.y
-                }
+                };
                 this.vertexes[i].alpha = Geometry.calcAlpha(e, curV);
             }
-
             this.vertexes.sort(sortFunc);
+            this.type = "Случайный";
+            return this.vertexes;
         },
 
         genRandWithNonEmptyCore: function(n, size) {
-
             this.dropVertexes();
-
             for (var i = 0; i < n; i++) {
                 this.addVertex(Point.genRand(0, size));
                 if (this.vertexes[i].y === this.maxY) {
                     swap(this.vertexes, i, 0);
                 }
             }
-
             var e = {x: 1, y: 0},
                 curV = {};
-
-            for (var i = 1; i < n; i++) {
+            for (i = 1; i < n; i++) {
                 curV = {
                     x: this.vertexes[i].x - this.vertexes[0].x,
                     y: this.vertexes[i].y - this.vertexes[0].y
-                }
+                };
                 this.vertexes[i].alpha = Geometry.calcAlpha(e, curV);
             }
-
             this.vertexes[0].alpha = -7;
             this.vertexes.sort(sortFunc);
+            this.type = "С непустым ядром";
+            return this.vertexes;
         },
 
         stretch: function(phi) {
@@ -165,9 +155,7 @@ var StarPolygon = (function() {
             this.center(width, height);
             Drawing.drawPolygon(this.vertexes, context, width, height, isVertexNumberNeeded);
         }
-
     }
-
 })();
 
 StarPolygon.__proto__ = BasePolygon;
