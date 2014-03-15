@@ -63,7 +63,7 @@ var Drawing = (function() {
         },
         drawAnimateLine = function(context, color, start, finish) {
             context.strokeStyle = color;
-            var lineLength = Geometry.dist(start, finish),
+            var lineLength = G.dist(start, finish),
                 offsetVector = {
                 x: (finish.x - start.x) / lineLength,
                 y: (finish.y - start.y) / lineLength
@@ -71,11 +71,11 @@ var Drawing = (function() {
                 interval = setInterval(function() {
                     context.beginPath();
                     context.moveTo(start.x, start.y);
-                    start = Geometry.vectorSum(start, offsetVector);
+                    start = G.vectorSum(start, offsetVector);
                     context.lineTo(start.x, start.y);
                     context.stroke();
                     drawPoint(context, color, finish);
-                    var distToFinish = Geometry.dist(start, finish);
+                    var distToFinish = G.dist(start, finish);
                     if (distToFinish < 1) clearInterval(interval);
                 }, 100 / Config.animatedDrawingSpeed);
         };

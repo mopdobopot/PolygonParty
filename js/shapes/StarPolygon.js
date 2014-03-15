@@ -33,27 +33,27 @@ var StarPolygon = (function() {
                 p2 = vertexes[j],
                 p3 = vertexes[k],
                 l = vertexes.length,
-                v1 = Geometry.makeVector(p2, p1),
-                v2 = Geometry.makeVector(p2, p3),
-                alpha = Geometry.calcAlpha(v1, v2);
+                v1 = G.makeVector(p2, p1),
+                v2 = G.makeVector(p2, p3),
+                alpha = G.calcAlpha(v1, v2);
             if (alpha < phi - Config.stretchingAccuracy) {
                 console.log("-------");
                 console.log(j);
                 console.log(alpha);
                 vertexes[j] = stretchVertex(p1, p2, p3, phi);
-                if (j == 0) {
+                if (j === 0) {
                     tryStretch(l - 2, l - 1, 0, phi, vertexes);
                 }
-                else if (j == 1) {
+                else if (j === 1) {
                     tryStretch(l - 1, 0, 1, phi, vertexes);
                 }
                 else {
                     tryStretch(j - 2, j - 1, j, phi, vertexes);
                 }
-                if (j == l - 2) {
+                if (j === l - 2) {
                     tryStretch(l - 2, l - 1, 0, phi, vertexes);
                 }
-                else if (j == l - 1) {
+                else if (j === l - 1) {
                     tryStretch(l - 1, 0, 1, phi, vertexes);
                 }
                 else {
@@ -62,18 +62,18 @@ var StarPolygon = (function() {
             }
         },
         stretchVertex = function(p1, p2, p3, phi) {
-            var p1p3 = Geometry.makeVector(p1, p3),
-                p1p3_center = shiftPoint(p1, Geometry.mulVectorOnScalar(p1p3, 0.5)),
-                guide = Geometry.makeVector(p2, p1p3_center),
-                v1 = Geometry.makeVector(p2, p1),
-                v2 = Geometry.makeVector(p2, p3),
-                alpha = Geometry.calcAlpha(v1, v2);
+            var p1p3 = G.makeVector(p1, p3),
+                p1p3_center = shiftPoint(p1, G.mulVectorOnScalar(p1p3, 0.5)),
+                guide = G.makeVector(p2, p1p3_center),
+                v1 = G.makeVector(p2, p1),
+                v2 = G.makeVector(p2, p3),
+                alpha = G.calcAlpha(v1, v2);
             while (alpha < phi - Config.stretchingAccuracy) {
-                p2 = shiftPoint(p2, Geometry.mulVectorOnScalar(guide, 0.5));
-                guide = Geometry.makeVector(p2, p1p3_center);
-                v1 = Geometry.makeVector(p2, p1);
-                v2 = Geometry.makeVector(p2, p3);
-                alpha = Geometry.calcAlpha(v1, v2);
+                p2 = shiftPoint(p2, G.mulVectorOnScalar(guide, 0.5));
+                guide = G.makeVector(p2, p1p3_center);
+                v1 = G.makeVector(p2, p1);
+                v2 = G.makeVector(p2, p3);
+                alpha = G.calcAlpha(v1, v2);
             }
             console.log(alpha);
             return p2;
@@ -98,7 +98,7 @@ var StarPolygon = (function() {
                     x: this.vertexes[i].x - starCenter.x,
                     y: this.vertexes[i].y - starCenter.y
                 };
-                this.vertexes[i].alpha = Geometry.calcAlpha(e, curV);
+                this.vertexes[i].alpha = G.calcAlpha(e, curV);
             }
             this.vertexes.sort(sortFunc);
             this.type = "Случайный";
@@ -120,7 +120,7 @@ var StarPolygon = (function() {
                     x: this.vertexes[i].x - this.vertexes[0].x,
                     y: this.vertexes[i].y - this.vertexes[0].y
                 };
-                this.vertexes[i].alpha = Geometry.calcAlpha(e, curV);
+                this.vertexes[i].alpha = G.calcAlpha(e, curV);
             }
             this.vertexes[0].alpha = -7;
             this.vertexes.sort(sortFunc);

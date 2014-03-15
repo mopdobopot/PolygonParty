@@ -33,9 +33,7 @@ $(document).ready(function() {
             currentVertexes[i].isClicked = true;
             clickedVertex = clone(currentVertexes[i]);
             clickedVertex.index = i;
-            Drawing.drawPolygon(currentVertexes, context, w, h, isChecked(checkbox_showVertexNumbers));
-            currentPolygon.vertexes = currentVertexes;
-            createInfoTable(currentPolygon);
+            redraw();
         }
     });
     $canvas.mouseup(function() {
@@ -43,18 +41,14 @@ $(document).ready(function() {
             currentVertexes[i].isClicked = undefined;
         }
         clickedVertex = undefined;
-        Drawing.drawPolygon(currentVertexes, context, w, h, isChecked(checkbox_showVertexNumbers));
-        currentPolygon.vertexes = currentVertexes;
-        createInfoTable(currentPolygon);
+        redraw();
     });
     $canvas.mousemove(function(e) {
         if (clickedVertex) {
             clickedVertex.x = e.offsetX;
             clickedVertex.y = e.offsetY;
             currentVertexes[clickedVertex.index] = clone(clickedVertex);
-            Drawing.drawPolygon(currentVertexes, context, w, h, isChecked(checkbox_showVertexNumbers));
-            currentPolygon.vertexes = currentVertexes;
-            createInfoTable(currentPolygon);
+            redraw();
         }
         else {
             var i = tryToFindVertex({x: e.offsetX, y: e.offsetY}, currentVertexes);
@@ -269,6 +263,10 @@ $(document).ready(function() {
     var div_showVertexNumbers = $('div#vertexNumbersOption'),
         checkbox_showVertexNumbers = $('input[name = withNumbers]');
 
+    checkbox_showVertexNumbers.click(function() {
+        redraw();
+    });
+
     // Кнопка "Нарисовать" ---------------------------------------------------------------------------------------------|
 
     button_generate.click(function() {
@@ -338,7 +336,7 @@ $(document).ready(function() {
                 "Тип": polygon.type,
                 "Периметр": polygon.getPerimeter(),
                 "Площадь": polygon.getSquare(),
-                "Альфа-выпуклость": 12
+                "Альфа-выпуклость": polygon.getAlphaConvexity()
             }
         },
         createInfoTable = function(polygon) {
@@ -353,6 +351,11 @@ $(document).ready(function() {
                     '</tr>';
             }
             return info;
+        },
+        redraw = function() {
+            Drawing.drawPolygon(currentVertexes, context, w, h, isChecked(checkbox_showVertexNumbers));
+            currentPolygon.vertexes = currentVertexes;
+            createInfoTable(currentPolygon);
         };
 
     // Скрыть/показать опции сохранения --------------------------------------------------------------------------------|
@@ -481,7 +484,7 @@ $(document).ready(function() {
                     generateAndDrawPolygon();
                 }
                 var polygonList = [currentVertexes];
-                for (var i = 1; i < n; i++) {
+                for (i = 1; i < n; i++) {
                     if (isChecked(checkbox_image)) {
                         canvas.toBlob(function(blob) {
                             saveAs(blob, name + i);

@@ -66,10 +66,10 @@ var Test = (function() {
         testDist: function() {
             console.log("\nTestDist");
             if (
-                compareNumbers(3, Geometry.dist({x: 0, y: 0}, {x: 3, y: 0})) &&
-                compareNumbers(1, Geometry.dist({x: 0, y: 0}, {x: 0, y: 1})) &&
-                compareNumbers(0, Geometry.dist({x: 0, y: 0}, {x: 0, y: 0})) &&
-                compareNumbers(Math.sqrt(13), Geometry.dist({x: 0, y: 0}, {x: 2, y: 3}))
+                compareNumbers(3, G.dist({x: 0, y: 0}, {x: 3, y: 0})) &&
+                compareNumbers(1, G.dist({x: 0, y: 0}, {x: 0, y: 1})) &&
+                compareNumbers(0, G.dist({x: 0, y: 0}, {x: 0, y: 0})) &&
+                compareNumbers(Math.sqrt(13), G.dist({x: 0, y: 0}, {x: 2, y: 3}))
             ) {
                 console.log("success\n");
                 return true;
@@ -86,12 +86,12 @@ var Test = (function() {
             var p1 = {x: 0, y: 0},
                 p2 = {x: 0, y: 2},
                 p3 = {x: 2, y: 0};
-            if (!compareNumbers(2, Geometry.getTriangleSquare(p1, p2, p3)))
+            if (!compareNumbers(2, G.getTriangleSquare(p1, p2, p3)))
                 success = false;
             p1 = {x: 2, y: -3};
             p2 = {x: 8, y: -3};
             p3 = {x: 4, y: -1};
-            if (!compareNumbers(6, Geometry.getTriangleSquare(p1, p2, p3)))
+            if (!compareNumbers(6, G.getTriangleSquare(p1, p2, p3)))
                 success = false;
             return logResult(success);
         },
@@ -127,7 +127,7 @@ var Test = (function() {
             bp.addVertex({x: 1, y: 1});
             if (!compareNumbers(9, bp.getSquare()))
                 success = false;
-            Geometry.shiftPolygon(bp.vertexes, Math.random() * 10000, Math.random() * 10000);
+            G.shiftPolygon(bp.vertexes, Math.random() * 10000, Math.random() * 10000);
             if (!compareNumbers(9, bp.getSquare()))
                 success = false;
             return logResult(success);
@@ -139,34 +139,34 @@ var Test = (function() {
                 p = {x: 0, y: 0},
                 segA = {x: 0, y: 1},
                 segB = {x: 1, y: 0};
-            if (!compareNumbers(Geometry.distToSegment(p, segA, segB), Math.sqrt(2) / 2)) {
+            if (!compareNumbers(G.distToSegment(p, segA, segB), Math.sqrt(2) / 2)) {
                 success = false;
             }
             segA.x = 1;
             segA.y = 1;
             segB.x = 1;
             segB.y = -1;
-            if (!compareNumbers(Geometry.distToSegment(p, segA, segB), 1)) {
+            if (!compareNumbers(G.distToSegment(p, segA, segB), 1)) {
                 success = false;
             }
             segA.x = 1;
             segA.y = 1;
             segB.x = 2;
             segB.y = 2;
-            if (!compareNumbers(Geometry.distToSegment(p, segA, segB), Math.sqrt(2))) {
+            if (!compareNumbers(G.distToSegment(p, segA, segB), Math.sqrt(2))) {
                 success = false;
             }
             segA.x = 1;
             segA.y = 1;
             segB.x = 3;
             segB.y = 2;
-            if (!compareNumbers(Geometry.distToSegment(p, segA, segB), Math.sqrt(2))) {
+            if (!compareNumbers(G.distToSegment(p, segA, segB), Math.sqrt(2))) {
                 success = false;
             }
             var tmp = segA;
             segA = segB;
             segB = tmp;
-            if (!compareNumbers(Geometry.distToSegment(p, segA, segB), Math.sqrt(2))) {
+            if (!compareNumbers(G.distToSegment(p, segA, segB), Math.sqrt(2))) {
                 success = false;
             }
             return logResult(success);
@@ -177,17 +177,17 @@ var Test = (function() {
             var success = true,
                 l1 = {a: 0, b: 1, c: -1},
                 l2 = {a: -1, b: 1, c: 0};
-            if (!comparePoints(Geometry.getLinesIntersection(l1, l2), {x: 1, y: 1})) {
+            if (!comparePoints(G.getLinesIntersection(l1, l2), {x: 1, y: 1})) {
                 success = false;
             }
             //Совпадающие
             l1 = l2;
-            if (Geometry.getLinesIntersection(l1, l2)) {
+            if (G.getLinesIntersection(l1, l2)) {
                 success = false;
             }
             //Параллельные
             l1 = {a: -1, b: 1, c: 1};
-            if (Geometry.getLinesIntersection(l1, l2)) {
+            if (G.getLinesIntersection(l1, l2)) {
                 success = false;
             }
             return logResult(success);
@@ -199,22 +199,22 @@ var Test = (function() {
                 p = {x: 0, y: 0},
                 segA = {x: 0, y: 1},
                 segB = {x: 1, y: 0};
-            if (Geometry.isPointOnSegment(p, segA, segB)) {
+            if (G.isPointOnSegment(p, segA, segB)) {
                 success = false;
             }
             segA = {x: -1, y: -1};
             segB = {x: 1, y: 1};
-            if (!Geometry.isPointOnSegment(p, segA, segB)) {
+            if (!G.isPointOnSegment(p, segA, segB)) {
                 success = false;
             }
             segA = {x: 0, y: 0};
-            if (!Geometry.isPointOnSegment(p, segA, segB)) {
+            if (!G.isPointOnSegment(p, segA, segB)) {
                 success = false;
             }
             p = {x: 2, y: -1};
             segA = {x: -100, y: -1};
             segB = {x: 2, y: 1};
-            if (Geometry.isPointOnSegment(p, segA, segB)) {
+            if (G.isPointOnSegment(p, segA, segB)) {
                 success = false;
             }
             return logResult(success);
@@ -230,31 +230,31 @@ var Test = (function() {
                     {x: 2, y: 0},
                     {x: 0, y: -2}
                 ];
-            if (!Geometry.isPointInPolygon(p, vertexes)) {
+            if (!G.isPointInPolygon(p, vertexes)) {
                 success = false;
             }
             p = {x: -2, y: 2};
-            if (Geometry.isPointInPolygon(p, vertexes)) {
+            if (G.isPointInPolygon(p, vertexes)) {
                 success = false;
             }
             p = {x: -0.1, y: 2};
-            if (Geometry.isPointInPolygon(p, vertexes)) {
+            if (G.isPointInPolygon(p, vertexes)) {
                 success = false;
             }
             p = {x: -3, y: -1};
-            if (Geometry.isPointInPolygon(p, vertexes)) {
+            if (G.isPointInPolygon(p, vertexes)) {
                 success = false;
             }
             p = {x: -1.99, y: 0};
-            if (!Geometry.isPointInPolygon(p, vertexes)) {
+            if (!G.isPointInPolygon(p, vertexes)) {
                 success = false;
             }
             p = {x: -2, y: 0};
-            if (!Geometry.isPointInPolygon(p, vertexes)) {
+            if (!G.isPointInPolygon(p, vertexes)) {
                 success = false;
             }
             p = {x: -100, y: 0};
-            if (Geometry.isPointInPolygon(p, vertexes)) {
+            if (G.isPointInPolygon(p, vertexes)) {
                 success = false;
             }
             return logResult(success);
