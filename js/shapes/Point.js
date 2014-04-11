@@ -1,25 +1,37 @@
 /**
- * @Author Lomovtsev Pavel
- * Date: 04.10.13
- * Time: 22:01
+ * @author Lomovtsev Pavel
+ * Date: 10.04.2014
+ * Time: 23:22
  */
-var Point = {
+//Принимает два числа
+function Point(x, y) {
 
-    arePointsEquals: function(p1, p2) {
-        return (p1.x === p2.x) && (p1.y === p2.y);
-    },
+    this.x = x;
+    this.y = y;
 
-    genRand: function(min, max) {
-        if (min > max) {
-            throw new Error("Неверный диапазон для генерации точки: [" + min + ".." + max + ")");
-        } else if (min < 0) {
-            throw new Error("Координаты генерируемой точки могут изменяться только от 0 до +inf");
-        } else {
-            return {
-                x: min + Math.random() * (max - min),
-                y: min + Math.random() * (max - min)
-            }
+    this.equalsToPoint = function(p) {
+        return (this.x === p.x) && (this.y === p.y);
+    };
+    this.distToPoint = function(p) {
+        return Math.sqrt((p.x - this.x) * (p.x - this.x) + (p.y - this.y) * (p.y - this.y));
+    };
+    this.distToLine = function(line) {
+        return Math.abs(line.a * this.x + line.b * this.y + line.c)
+             / Math.sqrt(line.a * line.a + line.b * line.b);
+    };
+    this.distToSegment = function(seg) {
+        var ab = new Vector(seg.a, seg.b),
+            ap = new Vector(seg.a, this),
+            ba = new Vector(seg.b, seg.a),
+            bp = new Vector(seg.b, this);
+        if (ab.getScalarProduct(ap) >= 0 && ba.getScalarProduct(bp) >= 0) {
+            return this.distToLine(new Line(seg.a, seg.b));
         }
+        else {
+            return Math.min(this.distToPoint(seg.a), this.distToPoint(seg.b));
+        }
+    };
+    this.toString = function() {
+        return "{x: " + this.x + ", y: " + this.y + "}";
     }
-
-};
+}
