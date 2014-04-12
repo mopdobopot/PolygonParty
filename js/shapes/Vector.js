@@ -3,12 +3,24 @@
  * Date: 10.04.2014
  * Time: 23:32
  */
-//Принимает два объекта @Point
-function Vector(p1, p2) {
+//Принимает два объекта @Point или два числа
+function Vector(a, b) {
 
-    this.x = p2.x - p1.x;
-    this.y = p2.y - p1.y;
+    if (typeof(a) === "object" && typeof(b) === "object") {
+        this.x = a.x - b.x;
+        this.y = a.y - b.y;
+    }
+    else if (typeof(a) === "number" && typeof(b) === "number") {
+        this.x = a;
+        this.y = b;
+    }
 
+    this.equalsToVector = function(v) {
+        return this.x === v.x && this.y === v.y;
+    };
+    this.getModule = function() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    };
     this.getSum = function(v) {
         return new Vector(this.x + v.x, this.y + v.y);
     };
@@ -28,7 +40,7 @@ function Vector(p1, p2) {
                             / G.dist(zero, this)
                             / G.dist(zero, v)),
             vp = this.getVectorProduct(v);
-        if (vp > 0) {
+        if (vp >= 0) {
             return alpha;
         }
         else {
