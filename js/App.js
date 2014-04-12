@@ -336,7 +336,7 @@ $(document).ready(function() {
                 "Тип": polygon.type,
                 "Периметр": polygon.getPerimeter(),
                 "Площадь": polygon.getSquare(),
-                "Альфа-выпуклость": polygon.getAlphaConvexity()
+                "Альфа-выпуклость": "Скоро..."
             }
         },
         createInfoTable = function(polygon) {
@@ -345,10 +345,12 @@ $(document).ready(function() {
         toHtml = function(object) {
             var info = "";
             for (var key in object) {
-                info += '<tr>' +
-                    '<td>' + key + ':</td>' +
-                    '<td>' + object[key] + '</td>' +
-                    '</tr>';
+                if (object.hasOwnProperty(key)) {
+                    info += '<tr>' +
+                        '<td>' + key + ':</td>' +
+                        '<td>' + object[key] + '</td>' +
+                        '</tr>';
+                }
             }
             return info;
         },

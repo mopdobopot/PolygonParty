@@ -11,7 +11,7 @@ var IO = (function() {
             ans += vertexes[i].x + " " + vertexes[i].y + "\n";
         }
         return ans;
-    }
+    };
 
     return {
         // принимаем массив vertexes

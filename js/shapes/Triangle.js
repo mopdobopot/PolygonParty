@@ -19,35 +19,35 @@ var Triangle = (function() {
 
         genRand: function(size) {
             this.dropVertexes();
-            this.addVertex({x: 0, y: 0});
+            this.addVertex(new Point(0, 0));
             var a = Math.random() * size,
                 b = Math.random() * size;
             generateType();
             if (equi) {
-                this.addVertex({x: a, y: 0});
-                this.addVertex({x: a / 2, y: a * Math.sqrt(3) / 2});
+                this.addVertex(new Point(a, 0));
+                this.addVertex(new Point(a / 2, a * Math.sqrt(3) / 2));
                 this.type = "Равносторонний";
             }
             else if (isos) {
                 if (rect) {
-                    this.addVertex({x: 0, y: a});
-                    this.addVertex({x: a, y: 0});
+                    this.addVertex(new Point(0, a));
+                    this.addVertex(new Point(a, 0));
                     this.type = "Прямоугольный равнобедренный";
                 }
                 else {
-                    this.addVertex({x: a, y: 0});
-                    this.addVertex({x: a / 2, y: b});
+                    this.addVertex(new Point(a, 0));
+                    this.addVertex(new Point(a / 2, b));
                     this.type = "Равнобедренный";
                 }
             }
             else if (rect) {
-                this.addVertex({x: 0, y: a});
-                this.addVertex({x: b, y: 0});
+                this.addVertex(new Point(0, a));
+                this.addVertex(new Point(b, 0));
                 this.type = "Прямоугольный";
             }
             else {
-                this.addVertex(Point.genRand(0, size));
-                this.addVertex(Point.genRand(0, size));
+                this.addVertex(G.getRandPoint(0, size));
+                this.addVertex(G.getRandPoint(0, size));
                 this.type = "Случайный";
             }
             return this.vertexes;

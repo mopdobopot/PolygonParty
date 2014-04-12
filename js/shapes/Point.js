@@ -31,6 +31,12 @@ function Point(x, y) {
             return Math.min(this.distToPoint(seg.a), this.distToPoint(seg.b));
         }
     };
+    this.getShiftedByVector = function(v) {
+        return new Point(this.x + v.x, this.y + v.y);
+    };
+    this.getMulOnScalar = function(scalar) {
+        return new Point(this.x * scalar, this.y * scalar);
+    };
     this.toString = function() {
         return "{x: " + this.x + ", y: " + this.y + "}";
     }

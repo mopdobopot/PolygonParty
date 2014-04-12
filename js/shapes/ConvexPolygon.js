@@ -14,10 +14,10 @@ var ConvexPolygon = (function() {
             var alpha = 2 * Math.PI / n,
                 curAlpha = 0;
                 r = Math.random() * size;
-            this.addVertex({x: r, y: 0});
+            this.addVertex(new Point(r, 0));
             for (var i = 1; i < n; i++) {
                 curAlpha += alpha;
-                this.addVertex({x: r * Math.cos(curAlpha), y: r * Math.sin(curAlpha)});
+                this.addVertex(new Point(r * Math.cos(curAlpha), r * Math.sin(curAlpha)));
             }
             if (n === 3) {
                 this.type = "Равносторонний";
@@ -43,16 +43,16 @@ var ConvexPolygon = (function() {
                 c = Math.random() * b,
                 d = Math.random() * size,
                 rect = (Math.random() * 100) < 30;
-            this.addVertex({x: 0, y: 0});
-            this.addVertex({x: a, y: 0});
+            this.addVertex(new Point(0, 0));
+            this.addVertex(new Point(a, 0));
             if (rect) {
-                this.addVertex({x: a, y: b});
-                this.addVertex({x: c, y: b});
+                this.addVertex(new Point(a, b));
+                this.addVertex(new Point(c, b));
                 this.type = "Прямоугольная трапеция";
             }
             else {
-                this.addVertex({x: b, y: d});
-                this.addVertex({x: c, y: d});
+                this.addVertex(new Point(b, d));
+                this.addVertex(new Point(c, d));
                 this.type = "Трапеция";
             }
             return this.vertexes;
@@ -78,24 +78,24 @@ var ConvexPolygon = (function() {
                 this.type = "Квадрат";
             }
             else if (rectangle) {
-                this.addVertex({x: 0, y: 0});
-                this.addVertex({x: a, y: 0});
-                this.addVertex({x: a, y: b});
-                this.addVertex({x: 0, y: b});
+                this.addVertex(new Point(0, 0));
+                this.addVertex(new Point(a, 0));
+                this.addVertex(new Point(a, b));
+                this.addVertex(new Point(0, b));
                 this.type = "Прямоугольник";
             }
             else if (rhombus) {
-                this.addVertex({x: a, y: 0});
-                this.addVertex({x: 0, y: b});
-                this.addVertex({x: -a, y: 0});
-                this.addVertex({x: 0, y: -b});
+                this.addVertex(new Point(a, 0));
+                this.addVertex(new Point(0, b));
+                this.addVertex(new Point(-a, 0));
+                this.addVertex(new Point(0, -b));
                 this.type = "Ромб";
             }
             else {
-                this.addVertex({x: a, y: 0});
-                this.addVertex({x: a, y: b});
-                this.addVertex({x: -a, y: 0});
-                this.addVertex({x: -a, y: -b});
+                this.addVertex(new Point(a, 0));
+                this.addVertex(new Point(a, b));
+                this.addVertex(new Point(-a, 0));
+                this.addVertex(new Point(-a, -b));
                 this.type = "Параллелограмм";
             }
             return this.vertexes;
@@ -133,11 +133,11 @@ var ConvexPolygon = (function() {
                 curAlpha = 0,
                 newAlpha;
             r = Math.random() * size;
-            this.addVertex({x: r, y: 0});
+            this.addVertex(new Point(r, 0));
             for (var i = 1; i < n; i++) {
                 newAlpha = Math.random() * maxAlpha;
                 curAlpha += newAlpha;
-                this.addVertex({x: r * Math.cos(curAlpha), y: r * Math.sin(curAlpha)});
+                this.addVertex(new Point(r * Math.cos(curAlpha), r * Math.sin(curAlpha)));
                 maxAlpha += alpha - newAlpha;
             }
             this.type = "Вписанный в окружность радиуса " + r;
