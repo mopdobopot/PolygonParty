@@ -15,6 +15,12 @@ function Vector(a, b) {
         this.y = b;
     }
 
+    this.equalsToVector = function(v) {
+        return this.x === v.x && this.y === v.y;
+    };
+    this.getModule = function() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    };
     this.getSum = function(v) {
         return new Vector(this.x + v.x, this.y + v.y);
     };
