@@ -31,21 +31,6 @@ var G = (function() {
             return vertexes;
         },
 
-        getTrianglePerimeter: function(p1, p2, p3) {
-            return this.dist(p1, p2) +
-                   this.dist(p2, p3) +
-                   this.dist(p3, p1);
-        },
-
-        getTriangleSquare: function(p1, p2, p3) {
-            var p = this.getTrianglePerimeter(p1, p2, p3) / 2,
-                a = this.dist(p1, p2),
-                b = this.dist(p2, p3),
-                c = this.dist(p3, p1);
-
-            return Math.sqrt(p * (p - a) * (p - b) * (p - c));
-        },
-
         vectorSum: function(v1, v2) {
             return {
                 x: v1.x + v2.x,
@@ -145,7 +130,7 @@ var G = (function() {
                    !Point.arePointsEquals(p, intervalB);
         },
 
-        //Лучём считаем правую часть прямой line относительно точки p,
+        //Лучём считаем правую часть прямой line относительно точки point,
         //пересечение луча и верхнего конца отрезка игнорируем
         isBeamIntersectsSegment: function(line, p, segA, segB) {
             var intersection = this.getLinesIntersection(line, this.makeLine(segA, segB));

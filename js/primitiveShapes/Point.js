@@ -5,7 +5,6 @@
  */
 //Принимает два числа
 function Point(x, y) {
-
     this.x = x;
     this.y = y;
 
@@ -36,6 +35,13 @@ function Point(x, y) {
     };
     this.getMulOnScalar = function(scalar) {
         return new Point(this.x * scalar, this.y * scalar);
+    };
+    this.isOnLine = function(line) {
+        return line.a * this.x + line.b * this.y + line.c === 0;
+    };
+    this.isOnBeam = function(beam) {
+        return this.isOnLine(beam.line) &&
+               beam.vector.sameDirected(new Vector(beam.point, this));
     };
     this.toString = function() {
         return "{x: " + this.x + ", y: " + this.y + "}";

@@ -5,7 +5,6 @@
  */
 //Принимает два объекта @Point или два числа
 function Vector(a, b) {
-
     if (typeof(a) === "object" && typeof(b) === "object") {
         this.x = b.x - a.x;
         this.y = b.y - a.y;
@@ -33,12 +32,11 @@ function Vector(a, b) {
     this.getVectorProduct = function(v) {
         return this.x * v.y - this.y * v.x;
     };
-    //От текущего до v, против часовой стрелки
+    //От текущего до v, по часовой стрелке
     this.getAlpha = function(v) {
-        var zero = {x: 0, y: 0},
-            alpha = Math.acos(this.getScalarProduct(v)
-                            / G.dist(zero, this)
-                            / G.dist(zero, v)),
+        var alpha = Math.acos(this.getScalarProduct(v)
+                            / this.getModule()
+                            / v.getModule()),
             vp = this.getVectorProduct(v);
         if (vp >= 0) {
             return alpha;
@@ -46,5 +44,8 @@ function Vector(a, b) {
         else {
             return (2 * Math.PI - alpha);
         }
+    };
+    this.sameDirected = function(v) {
+        return this.getVectorProduct(v) === 0 && this.getScalarProduct(v) > 0;
     }
 }

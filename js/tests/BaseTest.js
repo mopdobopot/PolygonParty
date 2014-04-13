@@ -13,8 +13,5 @@ var BaseTest = {
     },
     assertEquals: function(a, b) {
         return Math.abs(a - b) < this.eps;
-    },
-    assertMore: function(a, b) {
-        return a - b < this.eps;
     }
 };

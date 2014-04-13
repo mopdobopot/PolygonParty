@@ -15,5 +15,5 @@ var Config = {
     vertexRadius: 2.1,
     clickedVertexRadius: 1.6,
 
-    stretchingAccuracy: 0.000000001
+    stretchingEps: 0.0000001
 };

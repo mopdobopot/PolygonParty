@@ -71,10 +71,10 @@ var ConvexPolygon = (function() {
                 rectangle = (Math.random() * 100) < 20,
                 square = (Math.random() * 100) < 10;
             if (square) {
-                this.addVertex({x: 0, y: 0});
-                this.addVertex({x: a, y: 0});
-                this.addVertex({x: a, y: a});
-                this.addVertex({x: 0, y: a});
+                this.addVertex(new Point(0, 0));
+                this.addVertex(new Point(a, 0));
+                this.addVertex(new Point(a, a));
+                this.addVertex(new Point(0, a));
                 this.type = "Квадрат";
             }
             else if (rectangle) {

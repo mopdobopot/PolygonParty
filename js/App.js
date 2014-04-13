@@ -336,7 +336,7 @@ $(document).ready(function() {
                 "Тип": polygon.type,
                 "Периметр": polygon.getPerimeter(),
                 "Площадь": polygon.getSquare(),
-                "Альфа-выпуклость": "Скоро..."
+                "Альфа-выпуклость": polygon.getAlphaConvexity()
             }
         },
         createInfoTable = function(polygon) {
@@ -357,6 +357,7 @@ $(document).ready(function() {
         redraw = function() {
             Drawing.drawPolygon(currentVertexes, context, w, h, isChecked(checkbox_showVertexNumbers));
             currentPolygon.vertexes = currentVertexes;
+            currentPolygon.type = "Не определён";
             createInfoTable(currentPolygon);
         };
 
@@ -368,11 +369,11 @@ $(document).ready(function() {
     toggle_saveOptions.click(function() {
         if (div_saveOptions.is(':visible')) {
             div_saveOptions.slideUp(100);
-            toggle_saveOptions.text("Больше настроек");
+            toggle_saveOptions.text("Дополнительные параметры");
         }
         else {
             div_saveOptions.slideDown(100);
-            toggle_saveOptions.text("Меньше настроек");
+            toggle_saveOptions.text("Скрыть");
         }
     });
 

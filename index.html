@@ -7,21 +7,27 @@
     <script src="js/lib/jQuery.min.js"></script>
     <script src="js/lib/canvas-toBlob.js"></script>
     <script src="js/lib/FileSaver.js"></script>
+
     <script src="js/utils/Geometry.js"></script>
     <script src="js/utils/Drawing.js"></script>
     <script src="js/utils/IO.js"></script>
-    <script src="js/shapes/BasePolygon.js"></script>
-    <script src="js/shapes/Point.js"></script>
-    <script src="js/shapes/Line.js"></script>
-    <script src="js/shapes/Segment.js"></script>
-    <script src="js/shapes/Vector.js"></script>
-    <script src="js/shapes/Triangle.js"></script>
-    <script src="js/shapes/ConvexPolygon.js"></script>
-    <script src="js/shapes/StarPolygon.js"></script>
+
+    <script src="js/polygons/BasePolygon.js"></script>
+    <script src="js/polygons/Triangle.js"></script>
+    <script src="js/polygons/ConvexPolygon.js"></script>
+    <script src="js/polygons/StarPolygon.js"></script>
+
+    <script src="js/primitiveShapes/Point.js"></script>
+    <script src="js/primitiveShapes/Line.js"></script>
+    <script src="js/primitiveShapes/Segment.js"></script>
+    <script src="js/primitiveShapes/Vector.js"></script>
+    <script src="js/primitiveShapes/Beam.js"></script>
+    <script src="js/primitiveShapes/Peak.js"></script>
+
     <script src="js/tests/BaseTest.js"></script>
-    <script src="js/tests/Test.js"></script>
     <script src="js/tests/TestPoint.js"></script>
     <script src="js/tests/TestVector.js"></script>
+    <script src="js/tests/TestSegment.js"></script>
     <script src="js/Config.js"></script>
     <script src="js/App.js"></script>
 </head>
@@ -86,7 +92,7 @@
 
                 <div class="separator"></div>
 
-                <span id="saveOptionsToggle">Больше настроек</span>
+                <span id="saveOptionsToggle">Дополнительные параметры</span>
 
                 <div id="saveOptionsBlock">
                     <div id="polygonAmountOption" class="option">

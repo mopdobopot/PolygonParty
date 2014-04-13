@@ -36,10 +36,9 @@ var StarPolygon = (function() {
                 v1 = new Vector(p2, p1),
                 v2 = new Vector(p2, p3),
                 alpha = v1.getAlpha(v2);
-            if (alpha < phi - Config.stretchingAccuracy) {
-                console.log("-------");
-                console.log(j);
-                console.log(alpha);
+            if (alpha < phi - Config.stretchingEps) {
+                console.log("вершина " + j);
+                console.log("старый угол: " + alpha);
                 vertexes[j] = stretchVertex(p1, p2, p3, phi);
                 if (j === 0) {
                     tryStretch(l - 2, l - 1, 0, phi, vertexes);
@@ -68,14 +67,14 @@ var StarPolygon = (function() {
                 v1 = new Vector(p2, p1),
                 v2 = new Vector(p2, p3),
                 alpha = v1.getAlpha(v2);
-            while (alpha < phi - Config.stretchingAccuracy) {
+            while (alpha < phi - Config.stretchingEps) {
                 p2 = p2.getShiftedByVector(guide.getMulOnScalar(0.5));
                 guide = new Vector(p2, p1p3_center);
                 v1 = new Vector(p2, p1);
                 v2 = new Vector(p2, p3);
                 alpha = v1.getAlpha(v2);
             }
-            console.log(alpha);
+            console.log("новый угол: " + alpha + "\n");
             return p2;
         };
 
@@ -90,8 +89,9 @@ var StarPolygon = (function() {
                 starCenter = findAverage(this.vertexes),
                 curV = {};
             for (i = 0; i < n; i++) {
+                //Не понимаю, что здесь происходит
                 curV = this.vertexes[i].getShiftedByVector(starCenter.getMulOnScalar(-1));
-                this.vertexes[i].alpha = e.getAlpha(curV);
+                this.vertexes[i].alpha = e.getAlpha(new Vector(new Point(0, 0), curV));
             }
             this.vertexes.sort(sortFunc);
             this.type = "Случайный";
@@ -110,7 +110,7 @@ var StarPolygon = (function() {
                 curV = {};
             for (i = 1; i < n; i++) {
                 curV = this.vertexes[i].getShiftedByVector(this.vertexes[0].getMulOnScalar(-1));
-                this.vertexes[i].alpha = e.getAlpha(curV);
+                this.vertexes[i].alpha = e.getAlpha(new Vector(new Point(0, 0), curV));
             }
             this.vertexes[0].alpha = -7;
             this.vertexes.sort(sortFunc);

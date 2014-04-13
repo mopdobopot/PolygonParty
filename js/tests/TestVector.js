@@ -21,7 +21,7 @@ var TestVector = {
                 v1 = new Vector(p1, p2);
                 v2 = new Vector(p2, p3);
                 v3 = new Vector(p3, p1);
-                if (!this.assertMore(v1.getSum(v2).getModule(), v3.getModule()))
+                if (!this.assertEquals(v1.getSum(v2).getModule(), v3.getModule()))
                     throw new Error("нарушается неравенство треугольника");
             }
             this.logSuccess(testName);
@@ -48,6 +48,11 @@ var TestVector = {
             v2 = new Vector(-4, 0);
             if (!this.assertEquals(v1.getAlpha(v2), v2.getAlpha(v1)))
                 throw new Error("угол между противонаправленными векторами вычисляется неверно");
+
+            v1 = new Vector(1, 1);
+            v2 = new Vector(-1, 1);
+            if (v1.getAlpha(v2) > Math.PI)
+                throw new Error("угол вычисляется против часовой стрелки (договорённость: вычислять угол \"по часовой\"");
             this.logSuccess(testName);
         } catch (whatsWrong) {
             this.logFailure(testName, whatsWrong);

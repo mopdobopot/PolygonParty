@@ -7,13 +7,12 @@ var Triangle = (function() {
 
     var rect = false,
         isos = false,
-        equi = false;
-
-    var generateType = function() {
-        isos = (Math.random() * 100 < 30);
-        rect = (Math.random() * 100 < 30);
-        equi = (Math.random() * 100 < 10);
-    };
+        equi = false,
+        generateType = function() {
+            isos = (Math.random() * 100 < 30);
+            rect = (Math.random() * 100 < 30);
+            equi = (Math.random() * 100 < 10);
+        };
 
     return {
 
