@@ -52,7 +52,9 @@ function Line(a, b, c) {
         }
         else {
             var p = this.getIntersectionWithLine(segment.getLine());
-            return p.isOnSegment(segment) ? p : null;
+            return p === null ? null
+                              : p.isOnSegment(segment) ? p
+                                                       : null;
         }
     }
 }

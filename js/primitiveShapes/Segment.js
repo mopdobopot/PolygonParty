@@ -22,7 +22,7 @@ function Segment(p1, p2) {
         return new Vector(this.a, this.b);
     };
     this.getLine = function() {
-        return new Line(this.a, this.getVector());
+        return new Line(this.a, this.b);
     };
     this.getCenter = function() {
         return new Point((this.a.x + this.b.x) / 2, (this.a.y + this.b.y) / 2);

@@ -130,7 +130,7 @@ var BasePolygon = (function() {
                         center = seg.getCenter();
                         //Сначала подозреваем все точки на серединном перпендикуляре
                         currentPiece = seg.getCentralPerpendicular();
-                        //Затем, отсекаем всё что не лежит в областях пиков
+                        //Затем, отсекаем всё что не лежит в секторах пиков
                         piece1 = peakCut(pi, currentPiece, center);
                         piece2 = peakCut(pj, currentPiece, center);
                         //Если хотя бы один piece или их пересечение пусто, то пара пиков не представляет интереса. Иначе:
