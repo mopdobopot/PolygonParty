@@ -33,6 +33,7 @@ function Segment(p1, p2) {
             c = this.a.x * this.a.x + this.a.y * this.a.y - this.b.x * this.b.x - this.b.y * this.b.y;
         return new Line(a, b, c);
     };
+    //Может вернуть @Segment, @Point или null
     this.getIntersectionWithBeam = function(beam) {
         var l = this.getLine(),
             intersec = l.getIntersectionWithBeam(beam);

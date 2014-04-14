@@ -5,15 +5,23 @@
  */
 var Type = {
     isBeam: function(obj) {
-        return obj.hasOwnProperty("line");
+        return obj.hasOwnProperty("point") &&
+               obj.hasOwnProperty("vector") &&
+               obj.hasOwnProperty("line");
     },
     isLine: function(obj) {
-        return obj.hasOwnProperty("c");
+        return obj.hasOwnProperty("a") &&
+               obj.hasOwnProperty("b") &&
+               obj.hasOwnProperty("c");
     },
     isSegment: function(obj) {
-        return obj.hasOwnProperty("beamA");
+        return obj.hasOwnProperty("a") &&
+               obj.hasOwnProperty("b") &&
+               obj.hasOwnProperty("beamA") &&
+               obj.hasOwnProperty("beamB");
     },
     isPoint: function(obj) {
-        return obj.hasOwnProperty("x");
+        return obj.hasOwnProperty("x") &&
+               obj.hasOwnProperty("y");
     }
 };
