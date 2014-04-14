@@ -8,25 +8,23 @@ function Beam(point, vector) {
     this.vector = vector;
     this.line = new Line(point, point.getShiftedByVector(vector));
 
+    //Может вернуть @Beam, @Segment, @Point или null
     this.getIntersectionWithBeam = function(beam) {
-        var p = this.line.getIntersectionWithBeam(beam);
-        if (p === Infinity) {
-            var v = new Vector(this.point, beam.point);
-            if (v.sameDirected(this.vector)) {
-                return beam;
-            }
-            else if (v.getMulOnScalar(-1).sameDirected(beam.vector)) {
-                return this;
-            }
-            else {
-                return null;
-            }
-        }
-        else if (p === null) {
+        var intersec = this.line.getIntersectionWithBeam(beam);
+        if (intersec === null) {
             return null;
         }
-        else {
-            return p.isOnBeam(this) && p.isOnBeam(beam);
+        else if (Type.isBeam(intersec)) {
+            if (this.point.isOnBeam(beam)) {
+                return beam.point.isOnBeam(this) ? new Segment(this.point, beam.point)
+                                                 : this;
+            }
+            else {
+                return beam.point.isOnBeam(this) ? beam : null;
+            }
+        }
+        else if (Type.isPoint(intersec)) {
+            return intersec.isOnBeam(beam) ? intersec : null;
         }
     };
 }

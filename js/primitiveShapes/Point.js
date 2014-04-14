@@ -39,6 +39,12 @@ function Point(x, y) {
     this.isOnLine = function(line) {
         return line.a * this.x + line.b * this.y + line.c === 0;
     };
+    this.isOnSegment = function(segment) {
+        var ap = new Vector(segment.a, this),
+            bp = new Vector(segment.b, this);
+        return this.isOnLine(segment.getLine()) &&
+               !ap.sameDirected(bp);
+    };
     this.isOnBeam = function(beam) {
         return this.isOnLine(beam.line) &&
                beam.vector.sameDirected(new Vector(beam.point, this));

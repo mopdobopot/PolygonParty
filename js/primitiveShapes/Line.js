@@ -20,7 +20,7 @@ function Line(a, b, c) {
         throw new Error("Для задания прямой необходимы две различные точки, а переданы " + a.toString() + " и " + b.toString());
     }
 
-    //Возвращает infinity если прямые совпадают, null если параллельны
+    //Может вернуть @Point, infinity или null
     this.getIntersectionWithLine = function(line) {
         var d = line.a * this.b - this.a * line.b;
         if (d === 0) {
@@ -31,6 +31,7 @@ function Line(a, b, c) {
             y = (this.a * line.c - line.a * this.c) / d;
         return new Point(x, y);
     };
+    //Может вернуть @Beam, @Point или null
     this.getIntersectionWithBeam = function(beam) {
         var p = this.getIntersectionWithLine(beam.line);
         if (p === Infinity) {
@@ -41,7 +42,17 @@ function Line(a, b, c) {
         }
         else {
             var v = new Vector(beam.point, p);
-            return v.sameDirected(beam.vector)
+            return v.sameDirected(beam.vector) ? p : null;
+        }
+    };
+    //Может вернуть @Segment, @Point или null
+    this.getIntersectionWithSegment = function(segment) {
+        if (segment.a.isOnLine(this) && segment.b.isOnLine(this)) {
+            return segment;
+        }
+        else {
+            var p = this.getIntersectionWithLine(segment.getLine());
+            return p.isOnSegment(segment) ? p : null;
         }
     }
 }

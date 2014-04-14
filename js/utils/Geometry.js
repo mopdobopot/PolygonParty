@@ -222,6 +222,45 @@ var G = (function() {
             var v = this.makeVector(p1, p2),
                 c = this.mulVectorOnScalar(v, 0.5);
             return this.getNormalToLineContainsSegment(c, p1, p2);
+        },
+
+        getIntersection: function(a, b) {
+            if (a === null || b === null) {
+                return null;
+            }
+            else if (Type.isLine(a)) {
+                if (Type.isLine(b)) {
+                    return a.getIntersectionWithLine(b);
+                }
+                else if (Type.isBeam(b)) {
+                    return a.getIntersectionWithBeam(b);
+                }
+                else if (Type.isSegment(b)) {
+                    return a.getIntersectionWithSegment(b);
+                }
+            }
+            else if (Type.isBeam(a)) {
+                if (Type.isLine(b)) {
+                    return b.getIntersectionWithBeam(a);
+                }
+                else if (Type.isBeam(b)) {
+                    return a.getIntersectionWithBeam(b);
+                }
+                else if (Type.isSegment(b)) {
+                    return b.getIntersectionWithBeam(b);
+                }
+            }
+            else if (Type.isSegment(a)) {
+                if (Type.isLine(b)) {
+                    return b.getIntersectionWithSegment(a);
+                }
+                else if (Type.isBeam(b)) {
+                    return a.getIntersectionWithBeam(b);
+                }
+                else if (Type.isSegment(b)) {
+                    return a.getIntersectionWithSegment(b);
+                }
+            }
         }
     }
 })();

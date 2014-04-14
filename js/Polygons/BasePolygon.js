@@ -27,51 +27,25 @@ var BasePolygon = (function() {
             }
             return {sides: sides, peaks: peaks};
         },
-        isBeam = function(obj) {
-            return obj.hasOwnProperty("line");
-        },
-        isLine = function(obj) {
-            return obj.hasOwnProperty("c");
-        },
-        isSegment = function(obj) {
-            return obj.hasOwnProperty("beamA");
-        },
-        beamCut = function(p, peak, center) {
+        chooseBeam = function(intersection, peak, center) {
             var v1 = peak.beam1.vector,
                 v2 = peak.beam2.vector,
                 vCenter = new Vector(peak.vertex, center);
-            //Определяем направление луча-пересечения
+            //Определяем направление луча-(множества подозреваемых точек)
             if (v1.getVectorProduct(v2) * v1.getVectorProduct(vCenter) > 0) {
-                return new Beam(p, new Vector(p, center));
+                return new Beam(intersection, new Vector(intersection, center));
             }
             else {
-                return new Beam(p, new Vector(p, center).getMulOnScalar(-1));
+                return new Beam(intersection, new Vector(intersection, center).getMulOnScalar(-1));
             }
         },
-        //Отсечение лучами пика
+        //Отсечение от currentPiece лучами пика
         peakCut = function(peak, currentPiece, center) {
-            if (isLine(currentPiece)) {
-                var p1 = currentPiece.getIntersectionWithBeam(peak.beam1),
-                    p2 = currentPiece.getIntersectionWithBeam(peak.beam2);
-                //Если оба луча пересекают прямую, они отсекают отрезок
-                if (p1 != null && p2 != null) {
-                    return new Segment(p1, p2);
-                }
-                //Если один из лучей пересекает прямую, он отсекает луч
-                else if (p1 != null) {
-                    return beamCut(p1, peak, center);
-                }
-                else if (p2 != null) {
-                    return beamCut(p2, peak, center);
-                }
-                //Ни один из лучей не пересекает прямую
-                else {
-                    return currentPiece;
-                }
-            }
-            else if (isBeam(currentPiece)) {
-
-            }
+            var intersec1 = G.getIntersection(currentPiece, peak.beam1),
+                intersec2 = G.getIntersection(currentPiece, peak.beam2),
+                intersec = G.getIntersection(chooseBeam(intersec1, peak, center),
+                                             chooseBeam(intersec2, peak, center));
+            return intersec || null;
         };
 
     return {
@@ -145,7 +119,7 @@ var BasePolygon = (function() {
             this.sides = preCalc.sides;
             this.peaks = preCalc.peaks;
             var l = this.peaks.length,
-                seg, pi, pj, center, currentPiece; //currentPiece — множество подозреваемых точек
+                seg, pi, pj, piece1, piece2, center, currentPiece; //currentPiece — множество подозреваемых точек
             //Перебор всех пар несоседних пиков
             for (var i = 0; i < l - 1; i++) {
                 for (var j = i + 1; j < l; j++) {
@@ -156,7 +130,14 @@ var BasePolygon = (function() {
                         center = seg.getCenter();
                         //Сначала подозреваем все точки на серединном перпендикуляре
                         currentPiece = seg.getCentralPerpendicular();
+                        //Затем, отсекаем всё что не лежит в областях пиков
+                        piece1 = peakCut(pi, currentPiece, center);
+                        piece2 = peakCut(pj, currentPiece, center);
+                        //Если хотя бы один piece или их пересечение пусто, то пара пиков не представляет интереса. Иначе:
+                        if (piece1 != null && piece2 != null && G.getIntersection(piece1, piece2) != null) {
+                            //Влияние остальных пиков и сторон на выделенный промежуток
 
+                        }
                     }
                 }
             }
