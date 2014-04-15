@@ -77,6 +77,10 @@ function Segment(p1, p2) {
                         seg.b.y = t;
                     }
                 }
+            },
+            lessThan = function(p1, p2) {
+                return p1.x === p2.x ? p1.y < p2.y
+                                     : p1.x < p2.x;
             };
         if (intersec === null) {
             return null;
@@ -84,7 +88,23 @@ function Segment(p1, p2) {
         else if (intersec === Infinity) {
             swapIfNeed(this);
             swapIfNeed(segment);
-            //TODO
+            var a, b, c;
+            if (lessThan(this.a, segment.a)) {
+                a = this.a.distToPoint(this.b);
+                b = this.a.distToPoint(segment.a);
+                c = this.a.distToPoint(segment.b);
+                return b > a ? null
+                             : c > a ? new Segment(segment.a, this.b)
+                                     : segment;
+            }
+            else {
+                a = segment.a.distToPoint(segment.b);
+                b = segment.a.distToPoint(this.a);
+                c = segment.a.distToPoint(this.b);
+                return b > a ? null
+                             : c > a ? new Segment(this.a, segment.b)
+                                     : this;
+            }
         }
         else {
             return intersec.isOnSegment(this) && intersec.isOnSegment(segment) ? intersec
