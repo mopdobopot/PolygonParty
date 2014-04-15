@@ -27,11 +27,11 @@ var BasePolygon = (function() {
             }
             return {sides: sides, peaks: peaks};
         },
+        //Определяет направление луча-(множества допустимых точек, не попадающих в полосу стороны)
         chooseBeam = function(intersection, peak, center) {
             var v1 = peak.beam1.vector,
                 v2 = peak.beam2.vector,
                 vCenter = new Vector(peak.vertex, center);
-            //Определяем направление луча-(множества подозреваемых точек)
             if (v1.getVectorProduct(v2) * v1.getVectorProduct(vCenter) > 0) {
                 return new Beam(intersection, new Vector(intersection, center));
             }
@@ -39,13 +39,66 @@ var BasePolygon = (function() {
                 return new Beam(intersection, new Vector(intersection, center).getMulOnScalar(-1));
             }
         },
-        //Отсечение от currentPiece лучами пика
+        //Отсекает кусок от currentPiece лучами пика
         peakCut = function(peak, currentPiece, center) {
             var intersec1 = G.getIntersection(currentPiece, peak.beam1),
-                intersec2 = G.getIntersection(currentPiece, peak.beam2),
-                intersec = G.getIntersection(chooseBeam(intersec1, peak, center),
-                                             chooseBeam(intersec2, peak, center));
-            return intersec || null;
+                intersec2 = G.getIntersection(currentPiece, peak.beam2);
+            if (intersec1 === null) {
+                return intersec2 === null ? null : chooseBeam(intersec2, peak, center);
+            }
+            else if (intersec2 === null) {
+                return chooseBeam(intersec1, peak, center);
+            }
+            else {
+                return G.getIntersection(chooseBeam(intersec1, peak, center),
+                                         chooseBeam(intersec2, peak, center));
+            }
+        },
+        //Может вернуть @Beam, @Segment или null
+        getPieceForPeakPeak = function(peak1, peak2) {
+            if (peak1.isNeighbour(peak2)) {
+                return null;
+            }
+            var seg = new Segment(peak1.vertex, peak2.vertex),
+                center = seg.getCenter(),
+                //Сначала подозреваем все точки на серединном перпендикуляре
+                currentPiece = seg.getCentralPerpendicular(),
+                //Затем, отсекаем всё что не лежит в секторах пиков
+                pieceForPeak1 = peakCut(peak1, currentPiece, center),
+                pieceForPeak2 = peakCut(peak2, currentPiece, center);
+            return G.getIntersection(pieceForPeak1, pieceForPeak2);
+        },
+        //Возвращает обновлённый currentPiece с учётом эффекта, оказываемого effectPeak
+        applyPeakEffect = function(peak, effectPeak, currentPiece) {
+            if (currentPiece === null) {
+                return null;
+            }
+            var effectPiece, intersec, centPerp, pointOnCurrentPiece, beam, v;
+            effectPiece = getPieceForPeakPeak(peak, effectPeak);
+            if (effectPiece === null) {
+                return currentPiece;
+            }
+            else {
+                //intersec это @Point или null (TODO порисовать, убедиться)
+                intersec = G.getIntersection(currentPiece, effectPiece);
+                centPerp = new Segment(peak, effectPeak).getCentralPerpendicular();
+                pointOnCurrentPiece = currentPiece.getPointOn();
+                if (intersec === null) {
+                    //Если currentPiece целиком лежит ближе к effectPeak чем к peak, то currentPiece — пуст,
+                    //иначе, effectPeak не оказывает влияния на currentPiece
+                    return centPerp.arePointsOnSameSide(effectPeak, pointOnCurrentPiece) ? null
+                                                                                         : currentPiece;
+                }
+                else {
+                    //Выбираем направление на которое не влияет effectPeak
+                    v = new Vector(intersec, pointOnCurrentPiece);
+                    if (centPerp.arePointsOnSameSide(effectPeak, pointOnCurrentPiece)) {
+                        v = v.getMulOnScalar(-1);
+                    }
+                    beam = new Beam(intersec, v);
+                    return G.getIntersection(currentPiece, beam);
+                }
+            }
         };
 
     return {
@@ -119,25 +172,28 @@ var BasePolygon = (function() {
             this.sides = preCalc.sides;
             this.peaks = preCalc.peaks;
             var l = this.peaks.length,
-                seg, pi, pj, piece1, piece2, center, currentPiece; //currentPiece — множество подозреваемых точек
+                pi, pj, pk, currentPiece; //currentPiece — множество подозреваемых точек
             //Перебор всех пар несоседних пиков
             for (var i = 0; i < l - 1; i++) {
                 for (var j = i + 1; j < l; j++) {
                     pi = this.peaks[i];
                     pj = this.peaks[j];
-                    if (!pi.isNeighbour(pj)) {
-                        seg = new Segment(pi.vertex, pj.vertex);
-                        center = seg.getCenter();
-                        //Сначала подозреваем все точки на серединном перпендикуляре
-                        currentPiece = seg.getCentralPerpendicular();
-                        //Затем, отсекаем всё что не лежит в секторах пиков
-                        piece1 = peakCut(pi, currentPiece, center);
-                        piece2 = peakCut(pj, currentPiece, center);
-                        //Если хотя бы один piece или их пересечение пусто, то пара пиков не представляет интереса. Иначе:
-                        if (piece1 != null && piece2 != null && G.getIntersection(piece1, piece2) != null) {
-                            //Влияние остальных пиков и сторон на выделенный промежуток
-
+                    currentPiece = getPieceForPeakPeak(pi, pj);
+                    //Если пересечение пусто, то пара пиков не представляет интереса. Иначе:
+                    if (currentPiece != null) {
+                        //Влияние остальных пиков на выделенный промежуток
+                        for (var k = 0; k < l - 1; k++) {
+                            pk = this.peaks[k];
+                            if (!pk.vertex.equalsToPoint(pi) && !pk.vertex.equalsToPoint(pj)) {
+                                currentPiece = applyPeakEffect(pi, pk, currentPiece);
+                                currentPiece = applyPeakEffect(pj, pk, currentPiece);
+                                if (currentPiece === null) {
+                                    break;
+                                }
+                            }
                         }
+                        //Влияние сторон на выделенный промежуток
+
                     }
                 }
             }

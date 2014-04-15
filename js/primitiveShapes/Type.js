@@ -12,7 +12,8 @@ var Type = {
     isLine: function(obj) {
         return obj.hasOwnProperty("a") &&
                obj.hasOwnProperty("b") &&
-               obj.hasOwnProperty("c");
+               obj.hasOwnProperty("c") &&
+               obj.hasOwnProperty("pointOnLine");
     },
     isSegment: function(obj) {
         return obj.hasOwnProperty("a") &&

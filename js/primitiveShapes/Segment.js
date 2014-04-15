@@ -18,6 +18,9 @@ function Segment(p1, p2) {
     this.beamA = new Beam(this.a, externalNormal);
     this.beamB = new Beam(this.b, externalNormal);
 
+    this.getPointOn = function() {
+        return this.a;
+    };
     this.getVector = function() {
         return new Vector(this.a, this.b);
     };

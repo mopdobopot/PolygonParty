@@ -32,6 +32,9 @@ function Vector(a, b) {
     this.getVectorProduct = function(v) {
         return this.x * v.y - this.y * v.x;
     };
+    this.getPerpendicularVector = function() {
+        return new Vector(-this.y, this.x);
+    };
     //От текущего до v, по часовой стрелке
     this.getAlpha = function(v) {
         var alpha = Math.acos(this.getScalarProduct(v)

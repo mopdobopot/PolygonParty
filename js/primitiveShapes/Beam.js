@@ -8,6 +8,9 @@ function Beam(point, vector) {
     this.vector = vector;
     this.line = new Line(point, point.getShiftedByVector(vector));
 
+    this.getPointOn = function() {
+        return this.point;
+    };
     //Может вернуть @Beam, @Segment, @Point или null
     this.getIntersectionWithBeam = function(beam) {
         var intersec = this.line.getIntersectionWithBeam(beam);

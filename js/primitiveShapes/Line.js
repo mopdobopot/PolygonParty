@@ -9,6 +9,7 @@ function Line(a, b, c) {
         this.a = a.y - b.y;
         this.b = b.x - a.x;
         this.c = a.x * b.y - b.x * a.y;
+        this.pointOnLine = a;
     }
     //Конкретные значения a, b и с
     else {
@@ -20,6 +21,18 @@ function Line(a, b, c) {
         throw new Error("Для задания прямой необходимы две различные точки, а переданы " + a.toString() + " и " + b.toString());
     }
 
+    this.getPointOn = function() {
+        return this.pointOnLine;
+    };
+    this.getDirectingVector = function() {
+        return new Vector(-this.b, this.a);
+    };
+    this.arePointsOnSameSide = function(p1, p2) {
+        var v = this.getDirectingVector(),
+            v1 = new Vector(this.pointOnLine, p1),
+            v2 = new Vector(this.pointOnLine, p2);
+        return v.getVectorProduct(v1) * v.getVectorProduct(v2) > 0;
+    };
     //Может вернуть @Point, infinity или null
     this.getIntersectionWithLine = function(line) {
         var d = line.a * this.b - this.a * line.b;
