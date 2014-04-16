@@ -13,9 +13,12 @@ function Line(a, b, c) {
     }
     //Конкретные значения a, b и с
     else {
+        if (a === 0 && b === 0)
+            throw new Error("Для задания прямой необходимо чтобы a != 0 или b != 0");
         this.a = a;
         this.b = b;
         this.c = c;
+        this.pointOnLine = b != 0 ? new Point(0, -c / b) : new Point(-c / a, 0);
     }
 
     this.getPointOn = function() {
