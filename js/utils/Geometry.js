@@ -225,10 +225,9 @@ var G = (function() {
         },
 
         getIntersection: function(a, b) {
-            if (a === null || b === null) {
+            if (a === null || b === null)
                 return null;
-            }
-            else if (Type.isLine(a)) {
+            if (Type.isLine(a)) {
                 if (Type.isLine(b)) {
                     return a.getIntersectionWithLine(b);
                 }
@@ -260,6 +259,47 @@ var G = (function() {
                 else if (Type.isSegment(b)) {
                     return a.getIntersectionWithSegment(b);
                 }
+            }
+        },
+
+        getRotated: function(obj, phi) {
+            if (obj === null)
+                return null;
+            if (Type.isPoint(obj) || Type.isVector(obj)) {
+                return obj.getRotated(phi);
+            }
+            else if (Type.isSegment(obj)) {
+                return new Segment(obj.a.getRotated(phi), obj.b.getRotated(phi));
+            }
+            else if (Type.isBeam(obj)) {
+                return new Beam(obj.point.getRotated(), obj.vector.getRotated());
+            }
+            else if (Type.isLine(obj)) {
+                var a = obj.getPointOn(),
+                    b = a.getSum(obj.getDirectingVector());
+                return new Line(a.getRotated(phi), b.getRotated(phi));
+            }
+        },
+
+        getShifted: function(obj, v) {
+            if (obj === null)
+                return null;
+            if (Type.isPoint(obj)) {
+                return obj.getShiftedByVector(v);
+            }
+            else if (Type.isVector(obj)) {
+                return obj;
+            }
+            else if (Type.isSegment(obj)) {
+                return new Segment(obj.a.getShiftedByVector(v), obj.b.getShiftedByVector(v));
+            }
+            else if (Type.isBeam(obj)) {
+                return new Beam(obj.point.getShiftedByVector(v), obj.vector);
+            }
+            else if (Type.isLine(obj)) {
+                var a = obj.getPointOn(),
+                    b = a.getSum(obj.getDirectingVector());
+                return new Line(a.getShiftedByVector(v), b.getShiftedByVector(v));
             }
         }
     }

@@ -13,6 +13,7 @@ function Vector(a, b) {
         this.x = a;
         this.y = b;
     }
+    this.module = Math.sqrt(this.x * this.x + this.y * this.y);
 
     this.equalsToVector = function(v) {
         return this.x === v.x && this.y === v.y;
@@ -35,11 +36,15 @@ function Vector(a, b) {
     this.getPerpendicularVector = function() {
         return new Vector(-this.y, this.x);
     };
+    this.getRotated = function(phi) {
+        var p = new Point(this.x, this.y).getRotated(phi);
+        return new Vector(p.x, p.y);
+    };
     //От текущего до v, по часовой стрелке
     this.getAlpha = function(v) {
         var alpha = Math.acos(this.getScalarProduct(v)
-                            / this.getModule()
-                            / v.getModule()),
+                            / this.module
+                            / v.module),
             vp = this.getVectorProduct(v);
         if (vp >= 0) {
             return alpha;

@@ -131,7 +131,7 @@ var BasePolygon = (function() {
             return G.shiftPolygon(this.vertexes, dx, dy);
         },
 
-        rotate: function(phi) {
+        rotatePolygon: function(phi) {
             var n = this.vertexes.length,
                 oldX, newX = 0,
                 oldY, newY = 0,
@@ -205,7 +205,7 @@ var BasePolygon = (function() {
         },
 
         centerRotateAndDraw: function(width, height, context, isVertexNumberNeeded) {
-            this.rotate(Math.random() * Math.PI);
+            this.rotatePolygon(Math.random() * Math.PI);
             this.center(width, height);
             Drawing.drawPolygon(this.vertexes, context, width, height, isVertexNumberNeeded);
         }

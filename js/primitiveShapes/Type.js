@@ -21,8 +21,14 @@ var Type = {
                obj.hasOwnProperty("beamA") &&
                obj.hasOwnProperty("beamB");
     },
-    isPoint: function(obj) {
+    isVector: function(obj) {
         return obj.hasOwnProperty("x") &&
+               obj.hasOwnProperty("y") &&
+               obj.hasOwnProperty("module");
+    },
+    isPoint: function(obj) {
+        return !this.isVector(obj) &&
+               obj.hasOwnProperty("x") &&
                obj.hasOwnProperty("y");
     }
 };

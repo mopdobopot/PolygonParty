@@ -17,15 +17,15 @@ function Line(a, b, c) {
         this.b = b;
         this.c = c;
     }
-    if (this.a === 0 && this.b === 0) {
-        throw new Error("Для задания прямой необходимы две различные точки, а переданы " + a.toString() + " и " + b.toString());
-    }
 
     this.getPointOn = function() {
         return this.pointOnLine;
     };
     this.getDirectingVector = function() {
         return new Vector(-this.b, this.a);
+    };
+    this.getNormalVector = function() {
+        return new Vector(this.a, this.b);
     };
     this.arePointsOnSameSide = function(p1, p2) {
         var v = this.getDirectingVector(),

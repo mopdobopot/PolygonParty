@@ -54,7 +54,7 @@ var Triangle = (function() {
 
         drawRand: function(context, width, height, size, isVertexNumberNeeded) {
             this.genRand(size);
-            this.rotate(Math.random() * Math.PI);
+            this.rotatePolygon(Math.random() * Math.PI);
             this.center(width, height);
             Drawing.drawPolygon(this.vertexes, context, width, height, isVertexNumberNeeded);
         }

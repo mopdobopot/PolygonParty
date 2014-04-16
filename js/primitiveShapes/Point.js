@@ -49,6 +49,11 @@ function Point(x, y) {
         return this.isOnLine(beam.line) &&
                beam.vector.sameDirected(new Vector(beam.point, this));
     };
+    this.getRotated = function(phi) {
+        var newX = this.x * Math.cos(phi) - this.y * Math.sin(phi),
+            newY = this.x * Math.sin(phi) + this.y * Math.cos(phi);
+        return new Point(newX, newY);
+    };
     this.toString = function() {
         return "{x: " + this.x + ", y: " + this.y + "}";
     }

@@ -21,7 +21,7 @@ var TestVector = {
                 v1 = new Vector(p1, p2);
                 v2 = new Vector(p2, p3);
                 v3 = new Vector(p3, p1);
-                if (!this.assertEquals(v1.getSum(v2).getModule(), v3.getModule()))
+                if (!this.assertEquals(v1.getSum(v2).module, v3.module))
                     throw new Error("нарушается неравенство треугольника");
             }
             this.logSuccess(testName);
