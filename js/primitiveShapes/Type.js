@@ -30,5 +30,9 @@ var Type = {
         return !obj.hasOwnProperty("module") &&
                obj.hasOwnProperty("x") &&
                obj.hasOwnProperty("y");
+    },
+    isParabola: function(obj) {
+        return obj.hasOwnProperty("focus") &&
+               obj.hasOwnProperty("directrix")
     }
 };

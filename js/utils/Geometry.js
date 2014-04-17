@@ -237,6 +237,9 @@ var G = (function() {
                 else if (Type.isSegment(b)) {
                     return a.getIntersectionWithSegment(b);
                 }
+                else if (Type.isParabola(b)) {
+                    return b.getIntersectionWithLine(a);
+                }
             }
             else if (Type.isBeam(a)) {
                 if (Type.isLine(b)) {
@@ -248,6 +251,9 @@ var G = (function() {
                 else if (Type.isSegment(b)) {
                     return b.getIntersectionWithBeam(b);
                 }
+                else if (Type.isParabola(b)) {
+                    return b.getIntersectionWithBeam(a);
+                }
             }
             else if (Type.isSegment(a)) {
                 if (Type.isLine(b)) {
@@ -258,6 +264,23 @@ var G = (function() {
                 }
                 else if (Type.isSegment(b)) {
                     return a.getIntersectionWithSegment(b);
+                }
+                else if (Type.isParabola(b)) {
+                    return b.getIntersectionWithSegment(a);
+                }
+            }
+            else if (Type.isParabola(a)) {
+                if (Type.isLine(b)) {
+                    return a.getIntersectionWithSegment(b);
+                }
+                else if (Type.isBeam(b)) {
+                    return a.getIntersectionWithBeam(b);
+                }
+                else if (Type.isSegment(b)) {
+                    return a.getIntersectionWithSegment(b);
+                }
+                else if (Type.isParabola(b)) {
+                    return b.getIntersectionWithParabola(a);
                 }
             }
         },
@@ -278,6 +301,9 @@ var G = (function() {
                 var a = obj.getPointOn(),
                     b = a.getSum(obj.getDirectingVector());
                 return new Line(a.getRotated(phi), b.getRotated(phi));
+            }
+            else if (Type.isParabola(obj)) {
+                return new Parabola(this.getRotated(obj.focus, phi), this.getRotated(obj.directrix, phi));
             }
         },
 
@@ -300,6 +326,9 @@ var G = (function() {
                 var a = obj.getPointOn(),
                     b = a.getSum(obj.getDirectingVector());
                 return new Line(a.getShiftedByVector(v), b.getShiftedByVector(v));
+            }
+            else if (Type.isParabola(obj)) {
+                return new Parabola(this.getShifted(obj.focus, v), this.getShifted(obj.directrix, v));
             }
         }
     }
