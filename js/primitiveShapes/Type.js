@@ -22,12 +22,12 @@ var Type = {
                obj.hasOwnProperty("beamB");
     },
     isVector: function(obj) {
-        return obj.hasOwnProperty("x") &&
-               obj.hasOwnProperty("y") &&
-               obj.hasOwnProperty("module");
+        return obj.hasOwnProperty("module") &&
+               obj.hasOwnProperty("x") &&
+               obj.hasOwnProperty("y");
     },
     isPoint: function(obj) {
-        return !this.isVector(obj) &&
+        return !obj.hasOwnProperty("module") &&
                obj.hasOwnProperty("x") &&
                obj.hasOwnProperty("y");
     }

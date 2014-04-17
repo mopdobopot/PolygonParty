@@ -4,10 +4,13 @@
  * Time: 23:10
  */
 function Line(a, b, c) {
+    //Представление ax + by + c = 0
     //По двум точкам
     if (c === undefined) {
         this.a = a.y - b.y;
         this.b = b.x - a.x;
+        if (this.a === 0 && this.b === 0)
+            throw new Error("Для задания прямой необходимо чтобы a != 0 или b != 0");
         this.c = a.x * b.y - b.x * a.y;
         this.pointOnLine = a;
     }
@@ -19,6 +22,16 @@ function Line(a, b, c) {
         this.b = b;
         this.c = c;
         this.pointOnLine = b != 0 ? new Point(0, -c / b) : new Point(-c / a, 0);
+    }
+    //Представление y = m * x + n
+    if (this.b != 0) {
+        this.isXConst = false;
+        this.m = -this.a / this.b;
+        this.n = -this.c / this.b;
+    }
+    else {
+        this.isXConst = true;
+        this.x = -this.c / this.a;
     }
 
     this.getPointOn = function() {
