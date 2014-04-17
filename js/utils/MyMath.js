@@ -5,6 +5,14 @@
  */
 var MyMath = {
     solveQuadratic: function(a, b, c) {
+        if (a === 0) {
+            if (b === 0)
+                throw new Error("Квадратное уравнение задано неверно: a = 0 и b = 0");
+            return {
+                rootAmount: 1,
+                root: -c / b
+            }
+        }
         var d = b * b - 4 * a * c;
         if (d < 0)
             return {

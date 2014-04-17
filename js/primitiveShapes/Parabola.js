@@ -13,12 +13,12 @@ function Parabola(focus, directrix) {
     var intersec = G.getIntersection(directrix, new Line(focus, focus.getShiftedByVector(directrix.getNormalVector()))),
         v = new Vector(focus, intersec).getMulOnScalar(0.5);
     this.vertex = focus.getShiftedByVector(v);
-    //Представление ax^2 + bx^2 + 2gx + 2fy + 2hxy + c = 0
-    var t = directrix.a * directrix.a + directrix.b * directrix.b;
+    //Представление ax^2 + by^2 + 2gx + 2fy + 2hxy + c = 0
     this.a = directrix.b * directrix.b;
     this.b = directrix.a * directrix.a;
-    this.g = -t * focus.x + directrix.a * directrix.c;
-    this.f = -t * focus.y + directrix.b * directrix.c;
+    var t = this.a + this.b;
+    this.g = -(t * focus.x + directrix.a * directrix.c);
+    this.f = -(t * focus.y + directrix.b * directrix.c);
     this.h = -directrix.a * directrix.b;
     this.c = (focus.x * focus.x + focus.y * focus.y) * t - directrix.c * directrix.c;
 
@@ -37,13 +37,12 @@ function Parabola(focus, directrix) {
             if (res.rootAmount === 1)
                 return {
                     pointAmount: 1,
-                    p: new Point(line.x, res.root)
+                    p: [new Point(line.x, res.root)]
                 };
             if (res.rootAmount === 2)
                 return {
                     pointAmount: 2,
-                    p1: new Point(line.x, res.root1),
-                    p2: new Point(line.x, res.root2)
+                    p: [new Point(line.x, res.root1), new Point(line.x, res.root2)]
                 }
         }
         else {
@@ -59,14 +58,45 @@ function Parabola(focus, directrix) {
             if (res.rootAmount === 1)
                 return {
                     pointAmount: 1,
-                    p: new Point(res.root, line.m * res.root + line.n)
+                    p: [new Point(res.root, line.m * res.root + line.n)]
                 };
             if (res.rootAmount === 2)
                 return {
                     pointAmount: 2,
-                    p1: new Point(res.root1, line.m * res.root1 + line.n),
-                    p2: new Point(res.root2, line.m * res.root2 + line.n)
+                    p: [new Point(res.root1, line.m * res.root1 + line.n), new Point(res.root2, line.m * res.root2 + line.n)]
                 }
         }
+    };
+    this.getIntersectionWithBeam = function(beam) {
+        var intersec = this.getIntersectionWithLine(beam.line);
+        if (intersec.pointAmount === 0)
+            return intersec;
+        var res = {
+            pointAmount: 0,
+            p: []
+        };
+        for (var i = 0; i < intersec.p.length; i++) {
+            if (intersec.p[i].isOnBeam(beam)) {
+                res.pointAmount++;
+                res.p.push(intersec.p[i]);
+            }
+        }
+        return res;
+    };
+    this.getIntersectionWithSegment = function(segment) {
+        var intersec = this.getIntersectionWithLine(beam.line);
+        if (intersec.pointAmount === 0)
+            return intersec;
+        var res = {
+            pointAmount: 0,
+            p: []
+        };
+        for (var i = 0; i < intersec.p.length; i++) {
+            if (intersec.p[i].isOnSegment(segment)) {
+                res.pointAmount++;
+                res.p.push(intersec.p[i]);
+            }
+        }
+        return res;
     }
 }
