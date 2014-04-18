@@ -11,6 +11,10 @@ function Beam(point, vector) {
     this.getPointOn = function() {
         return this.point;
     };
+    this.equalsToBeam = function(beam) {
+        return this.point.equalsToPoint(beam.point) &&
+               this.vector.equalsToVector(beam.vector);
+    };
     //Может вернуть @Beam, @Segment, @Point или null
     this.getIntersectionWithBeam = function(beam) {
         var intersec = this.line.getIntersectionWithBeam(beam);

@@ -28,15 +28,24 @@ var BasePolygon = (function() {
             return {sides: sides, peaks: peaks};
         },
         //Определяет направление луча-(множества допустимых точек, не попадающих в полосу стороны)
-        chooseBeam = function(intersection, peak, center) {
-            var v1 = peak.beam1.vector,
-                v2 = peak.beam2.vector,
-                vCenter = new Vector(peak.vertex, center);
-            if (v1.getVectorProduct(v2) * v1.getVectorProduct(vCenter) > 0) {
-                return new Beam(intersection, new Vector(intersection, center));
+        chooseBeam = function(intersection, curBeam, peak, center) {
+            var v1, v2, vCenter = new Vector(intersection, center);
+            if (curBeam.equalsToBeam(peak.beam1)) {
+                v1 = peak.beam1.vector;
+                v2 = peak.beam2.vector;
+            }
+            else if (curBeam.equalsToBeam(peak.beam2)) {
+                v1 = peak.beam2.vector;
+                v2 = peak.beam1.vector;
             }
             else {
-                return new Beam(intersection, new Vector(intersection, center).getMulOnScalar(-1));
+                throw new Error("метод chooseBeam() вызван с несвязанными пиком и лучём");
+            }
+            if (v1.getVectorProduct(v2) * v1.getVectorProduct(vCenter) > 0) {
+                return new Beam(intersection, vCenter);
+            }
+            else {
+                return new Beam(intersection, vCenter.getMulOnScalar(-1));
             }
         },
         //Отсекает кусок от currentPiece лучами пика
@@ -44,14 +53,14 @@ var BasePolygon = (function() {
             var intersec1 = G.getIntersection(currentPiece, peak.beam1),
                 intersec2 = G.getIntersection(currentPiece, peak.beam2);
             if (intersec1 === null) {
-                return intersec2 === null ? null : chooseBeam(intersec2, peak, center);
+                return intersec2 === null ? null : chooseBeam(intersec2, peak.beam2, peak, center);
             }
             else if (intersec2 === null) {
-                return chooseBeam(intersec1, peak, center);
+                return chooseBeam(intersec1, peak.beam1, peak, center);
             }
             else {
-                return G.getIntersection(chooseBeam(intersec1, peak, center),
-                                         chooseBeam(intersec2, peak, center));
+                return G.getIntersection(chooseBeam(intersec1, peak.beam1, peak, center),
+                                         chooseBeam(intersec2, peak.beam2, peak, center));
             }
         },
         //Может вернуть @Beam, @Segment или null
@@ -84,6 +93,7 @@ var BasePolygon = (function() {
                 centPerp = new Segment(peak, effectPeak).getCentralPerpendicular();
                 pointOnCurrentPiece = currentPiece.getPointOn();
                 if (intersec === null) {
+                    //TODO БАГ! effectPeak — луч, непересекающий луч currentPiece и логика неверная
                     //Если currentPiece целиком лежит ближе к effectPeak чем к peak, то currentPiece — пуст,
                     //иначе, effectPeak не оказывает влияния на currentPiece
                     return centPerp.arePointsOnSameSide(effectPeak, pointOnCurrentPiece) ? null
@@ -171,18 +181,19 @@ var BasePolygon = (function() {
             var preCalc = calcSidesAndPeaks(this.vertexes);
             this.sides = preCalc.sides;
             this.peaks = preCalc.peaks;
-            var l = this.peaks.length,
+            var lp = this.peaks.length,
+                ls = this.sides.length,
                 pi, pj, pk, currentPiece; //currentPiece — множество подозреваемых точек
             //Перебор всех пар несоседних пиков
-            for (var i = 0; i < l - 1; i++) {
-                for (var j = i + 1; j < l; j++) {
+            for (var i = 0; i < lp - 1; i++) {
+                for (var j = i + 1; j < lp; j++) {
                     pi = this.peaks[i];
                     pj = this.peaks[j];
                     currentPiece = getPieceForPeakPeak(pi, pj);
                     //Если пересечение пусто, то пара пиков не представляет интереса. Иначе:
                     if (currentPiece != null) {
                         //Влияние остальных пиков на выделенный промежуток
-                        for (var k = 0; k < l - 1; k++) {
+                        for (var k = 0; k < lp; k++) {
                             pk = this.peaks[k];
                             if (!pk.vertex.equalsToPoint(pi) && !pk.vertex.equalsToPoint(pj)) {
                                 currentPiece = applyPeakEffect(pi, pk, currentPiece);
@@ -193,7 +204,9 @@ var BasePolygon = (function() {
                             }
                         }
                         //Влияние сторон на выделенный промежуток
+                        for (k = 0; k < ls; k++) {
 
+                        }
                     }
                 }
             }
