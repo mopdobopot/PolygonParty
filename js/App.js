@@ -502,7 +502,7 @@ $(document).ready(function() {
     });
 
     var savePolygons = function(polygonList, txtName, pngName) {
-            IO.writeToSingleFile(polygonList, txtName + ".txt")
+            IO.writeToSingleFile(polygonList, txtName + ".txt");
             if (checkbox_image.prop('checked')) {
                 canvas.toBlob(function(blob) {
                     saveAs(blob, pngName + ".png");
