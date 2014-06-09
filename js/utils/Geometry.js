@@ -197,16 +197,42 @@ var G = (function() {
             }
         },
 
-        getBisector: function(seg1A, seg1B, seg2A, seg2B) {
-            var l1 = this.makeLine(seg1A, seg1B),
-                l2 = this.makeLine(seg2A, seg2B),
-                intersec = this.getLinesIntersection(l1, l2),
-                v1 = this.makeVector(seg1A, seg1B),
-                v2 = this.makeVector(seg2A, seg2B),
-                alpha = this.calcAlpha(v1, v2) / 2,
-                vb = this.rotateVector(this.makeVector(intersec, seg1A), alpha),
-                pointOnBisector = this.vectorSum(intersec, vb);
-            return this.makeLine(intersec, pointOnBisector);
+        getBisectors: function(line1, line2) {
+            var intersec = this.getIntersection(line1, line2),
+                alpha = line1.getDirectingVector().getAlpha(line2.getDirectingVector()) / 2,
+                v1 = line1.getDirectingVector().getRotated(alpha),
+                v2 = v1.getRotated(Math.PI / 2);
+            if (intersec === null) {
+                return null;
+            }
+            if (intersec === Infinity) {
+                return line1;
+            }
+            //Пара пересекающихся прямых задаёт 2 биссектрисы
+            return {
+                b1: new Line(intersec, intersec.getShiftedByVector(v1)),
+                b2: new Line(intersec, intersec.getShiftedByVector(v2))
+            }
+        },
+
+        //Выбирает из двух биссектрис одну — проходящую через область в которой лежит фокус
+        chooseBisectorInSameSectorAsFocus: function(line1, line2, focus) {
+            var intersec = this.getIntersection(line1, line2),
+                bisectors = this.getBisectors(line1, line2),
+                b1 = bisectors.b1,
+                b2 = bisectors.b2;
+            if (intersec === null || intersec === Infinity) {
+                return null;
+            }
+            var p = intersec.getShiftedByVector(b1.getDirectingVector()),
+                invertedP = intersec.getShiftedByVector(b1.getDirectingVector().getMulOnScalar(-1));
+            if (line1.arePointsOnSameSide(focus, p) && line2.arePointsOnSameSide(focus, p) ||
+                line1.arePointsOnSameSide(focus, invertedP) && line2.arePointsOnSameSide(focus, invertedP)) {
+                return b1;
+            }
+            else {
+                return b2;
+            }
         },
 
         getNormalToLineContainsSegment: function(point, segA, segB) {
@@ -281,6 +307,17 @@ var G = (function() {
                 }
                 else if (Type.isParabola(b)) {
                     return b.getIntersectionWithParabola(a);
+                }
+            }
+            else if (Type.isParabolicBeam(a)) {
+                if (Type.isParabolicBeam(b)) {
+                    return a.getIntersectionWithParabolicBeam(b);
+                }
+                else if (Type.isParabolicSegment(b)) {
+                    return a.getIntersectionWithParabolicSegment(b);
+                }
+                else {
+                    return a.getIntersectionWithOtherShape(b);
                 }
             }
         },

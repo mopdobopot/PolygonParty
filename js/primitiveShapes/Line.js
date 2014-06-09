@@ -49,6 +49,9 @@ function Line(a, b, c) {
             v2 = new Vector(this.pointOnLine, p2);
         return v.getVectorProduct(v1) * v.getVectorProduct(v2) > 0;
     };
+    this.isEqualToLine = function(line) {
+        return this.getIntersectionWithLine(line) === Infinity;
+    };
     //Может вернуть @Point, infinity или null
     this.getIntersectionWithLine = function(line) {
         var d = line.a * this.b - this.a * line.b;

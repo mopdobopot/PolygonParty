@@ -7,6 +7,7 @@
 function Parabola(focus, directrix) {
     this.focus = focus;
     this.directrix = directrix;
+    this.directrixNormalVector = new Vector(-directrix.b, directrix.a);
     //Представление y = 2px. Прежде чем искать пересечение с прямой, прямую нужно повернуть на angle и
     //сдвинуть на вектор, смотрящий из нуля в vertex. Затем, найти пересечения и сдвинуть-повернуть их обратно
     this.angle = new Vector(0, 1).getAlpha(directrix.getDirectingVector());
@@ -22,6 +23,9 @@ function Parabola(focus, directrix) {
     this.h = -directrix.a * directrix.b;
     this.c = (focus.x * focus.x + focus.y * focus.y) * t - directrix.c * directrix.c;
 
+    this.getPointOn = function() {
+        return this.focus;
+    };
     this.getIntersectionWithLine = function(line) {
         var a, b, c, res;
         if (line.isXConst) {
@@ -32,7 +36,8 @@ function Parabola(focus, directrix) {
             res = MyMath.solveQuadratic(a, b, c);
             if (res.rootAmount === 0)
                 return {
-                    pointAmount: 0
+                    pointAmount: 0,
+                    p: []
                 };
             if (res.rootAmount === 1)
                 return {
@@ -53,7 +58,8 @@ function Parabola(focus, directrix) {
             res = MyMath.solveQuadratic(a, b, c);
             if (res.rootAmount === 0)
                 return {
-                    pointAmount: 0
+                    pointAmount: 0,
+                    p: []
                 };
             if (res.rootAmount === 1)
                 return {
@@ -98,5 +104,33 @@ function Parabola(focus, directrix) {
             }
         }
         return res;
+    };
+    this.getIntersectionWithParabola = function(parabola) {
+        //Общий фокус
+        if (this.focus.equalsToPoint(parabola.focus)) {
+            var b = G.chooseBisectorInSameSectorAsFocus(this.directrix, parabola.directrix, this.focus);
+            if (b === null) {
+                return {
+                    pointAmount: 0,
+                    p: []
+                }
+            }
+            else {
+                return this.getIntersectionWithLine(b);
+            }
+        }
+        //Общая директриса
+        else if (this.directrix.isEqualToLine(parabola.directrix)) {
+            if (!this.directrix.arePointsOnSameSide(this.focus, parabola.focus)) {
+                return {
+                    pointAmount: 0,
+                    p: []
+                }
+            }
+            else {
+                var centrPerp = new Segment(this.focus, parabola.focus).getCentralPerpendicular();
+                return this.getIntersectionWithLine(centrPerp);
+            }
+        }
     }
 }

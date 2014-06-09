@@ -77,6 +77,9 @@ var BasePolygon = (function() {
                 pieceForPeak2 = peakCut(peak2, currentPiece, center);
             return G.getIntersection(pieceForPeak1, pieceForPeak2);
         },
+        getPieceForPeakSide = function(peak, side) {
+
+        },
         //Возвращает обновлённый currentPiece с учётом эффекта, оказываемого effectPeak
         applyPeakEffect = function(peak, effectPeak, currentPiece) {
             if (currentPiece === null) {
@@ -90,25 +93,31 @@ var BasePolygon = (function() {
             else {
                 //intersec это @Point или null (TODO порисовать, убедиться)
                 intersec = G.getIntersection(currentPiece, effectPiece);
-                centPerp = new Segment(peak, effectPeak).getCentralPerpendicular();
+                centPerp = new Segment(peak.vertex, effectPeak.vertex).getCentralPerpendicular();
                 pointOnCurrentPiece = currentPiece.getPointOn();
                 if (intersec === null) {
-                    //TODO БАГ! effectPeak — луч, непересекающий луч currentPiece и логика неверная
                     //Если currentPiece целиком лежит ближе к effectPeak чем к peak, то currentPiece — пуст,
                     //иначе, effectPeak не оказывает влияния на currentPiece
-                    return centPerp.arePointsOnSameSide(effectPeak, pointOnCurrentPiece) ? null
-                                                                                         : currentPiece;
+                    return centPerp.arePointsOnSameSide(effectPeak.vertex, pointOnCurrentPiece) ? null
+                                                                                                : currentPiece;
                 }
                 else {
                     //Выбираем направление на которое не влияет effectPeak
                     v = new Vector(intersec, pointOnCurrentPiece);
-                    if (centPerp.arePointsOnSameSide(effectPeak, pointOnCurrentPiece)) {
+                    if (centPerp.arePointsOnSameSide(effectPeak.vertex, pointOnCurrentPiece)) {
                         v = v.getMulOnScalar(-1);
                     }
                     beam = new Beam(intersec, v);
                     return G.getIntersection(currentPiece, beam);
                 }
             }
+        },
+        applySideEffect = function(peak, effectSide, currentPiece) {
+            if (currentPiece === null) {
+                return null;
+            }
+            var effectPiece, intersec, parabola;
+            effectPiece = getPieceForPeakSide(peak, effectSide);
         };
 
     return {
@@ -183,7 +192,7 @@ var BasePolygon = (function() {
             this.peaks = preCalc.peaks;
             var lp = this.peaks.length,
                 ls = this.sides.length,
-                pi, pj, pk, currentPiece; //currentPiece — множество подозреваемых точек
+                pi, pj, pk, sk, currentPiece; //currentPiece — множество подозреваемых точек
             //Перебор всех пар несоседних пиков
             for (var i = 0; i < lp - 1; i++) {
                 for (var j = i + 1; j < lp; j++) {
@@ -198,14 +207,21 @@ var BasePolygon = (function() {
                             if (!pk.vertex.equalsToPoint(pi) && !pk.vertex.equalsToPoint(pj)) {
                                 currentPiece = applyPeakEffect(pi, pk, currentPiece);
                                 currentPiece = applyPeakEffect(pj, pk, currentPiece);
-                                if (currentPiece === null) {
-                                    break;
-                                }
+                                if (currentPiece === null) break;
                             }
                         }
+                        if (currentPiece === null) continue;
                         //Влияние сторон на выделенный промежуток
                         for (k = 0; k < ls; k++) {
-
+                            sk = this.sides[k];
+                            if (!pi.equalsToPoint(sk.a) && !pi.equalsToPoint(sk.b)) {
+                                currentPiece = applySideEffect(pi, sk, currentPiece);
+                                if (currentPiece === null) break;
+                            }
+                            if (!pj.equalsToPoint(sk.a) && !pj.equalsToPoint(sk.b)) {
+                                currentPiece = applySideEffect(pj, sk, currentPiece);
+                                if (currentPiece === null) break;
+                            }
                         }
                     }
                 }

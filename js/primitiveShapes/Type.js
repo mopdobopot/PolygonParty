@@ -33,6 +33,15 @@ var Type = {
     },
     isParabola: function(obj) {
         return obj.hasOwnProperty("focus") &&
-               obj.hasOwnProperty("directrix")
+               obj.hasOwnProperty("directrix");
+    },
+    isParabolicSegment: function(obj) {
+        return obj.hasOwnProperty("parabola") &&
+               obj.hasOwnProperty("normalLineA") &&
+               obj.hasOwnProperty("normalLineB");
+    },
+    isParabolicBeam: function(obj) {
+        return obj.hasOwnProperty("parabola") &&
+               obj.hasOwnProperty("normalLine");
     }
 };
