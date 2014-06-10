@@ -52,6 +52,9 @@ function Line(a, b, c) {
     this.isEqualToLine = function(line) {
         return this.getIntersectionWithLine(line) === Infinity;
     };
+    this.isPointOnLine = function(point) {
+        return point.y === this.m * point.x + this.n;
+    };
     //Может вернуть @Point, infinity или null
     this.getIntersectionWithLine = function(line) {
         var d = line.a * this.b - this.a * line.b;

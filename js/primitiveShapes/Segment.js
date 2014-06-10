@@ -21,7 +21,7 @@ function Segment(p1, p2) {
     this.getPointOn = function() {
         return this.a;
     };
-    this.getVector = function() {
+    this.getDirectingVector = function() {
         return new Vector(this.a, this.b);
     };
     this.getLine = function() {

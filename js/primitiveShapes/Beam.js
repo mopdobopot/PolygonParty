@@ -9,11 +9,17 @@ function Beam(point, vector) {
     this.line = new Line(point, point.getShiftedByVector(vector));
 
     this.getPointOn = function() {
-        return this.point;
+        return this.point.getShiftedByVector(this.vector);
     };
     this.equalsToBeam = function(beam) {
         return this.point.equalsToPoint(beam.point) &&
                this.vector.equalsToVector(beam.vector);
+    };
+    this.getNormalVector = function() {
+        return this.line.getNormalVector();
+    };
+    this.getDirectingVector = function() {
+        return this.vector;
     };
     //Может вернуть @Beam, @Segment, @Point или null
     this.getIntersectionWithBeam = function(beam) {
