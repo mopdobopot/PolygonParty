@@ -217,14 +217,14 @@ var G = (function() {
 
         //Выбирает из двух биссектрис одну — проходящую через область в которой лежит фокус
         chooseBisectorInSameSectorAsFocus: function(line1, line2, focus) {
-            var intersec = this.getIntersection(line1, line2),
-                bisectors = this.getBisectors(line1, line2),
-                b1 = bisectors.b1,
-                b2 = bisectors.b2;
+            var intersec = this.getIntersection(line1, line2);
             if (intersec === null || intersec === Infinity) {
                 return null;
             }
-            var p = intersec.getShiftedByVector(b1.getDirectingVector()),
+            var bisectors = this.getBisectors(line1, line2),
+                b1 = bisectors.b1,
+                b2 = bisectors.b2,
+                p = intersec.getShiftedByVector(b1.getDirectingVector()),
                 invertedP = intersec.getShiftedByVector(b1.getDirectingVector().getMulOnScalar(-1));
             if (line1.arePointsOnSameSide(focus, p) && line2.arePointsOnSameSide(focus, p) ||
                 line1.arePointsOnSameSide(focus, invertedP) && line2.arePointsOnSameSide(focus, invertedP)) {
@@ -233,6 +233,21 @@ var G = (function() {
             else {
                 return b2;
             }
+        },
+
+        //Возвращает среднюю линию двух параллельных прямых
+        getMidLine: function(line1, line2) {
+            if (line1.getIntersectionWithLine(line2) != null)
+                throw Error("Невозможно найти среднюю линию, прямые непараллельны");
+            var d = line1.getPointOn().distToLine(line2) / 2,
+                normalizedNormalVector = line1.getNormalVector().getMulOnScalar(d / line1.getNormalVector().getModule());
+            //Разворачиваем вектор нормали, чтобы он был направлен ко второй прямой
+            if (!line1.arePointsOnSameSide(line1.getPointOn().getShiftedByVector(normalizedNormalVector), line2.getPointOn())) {
+                normalizedNormalVector = normalizedNormalVector.getMulOnScalar(-1);
+            }
+            var p1 = line1.getPointOn().getShiftedByVector(normalizedNormalVector),
+                p2 = line1.getPointOn().getShiftedByVector(line1.getDirectingVector()).getShiftedByVector(normalizedNormalVector);
+            return new Line(p1, p2);
         },
 
         getNormalToLineContainsSegment: function(point, segA, segB) {

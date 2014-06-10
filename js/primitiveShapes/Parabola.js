@@ -17,7 +17,7 @@ function Parabola(focus, directrix) {
     //Представление ax^2 + by^2 + 2gx + 2fy + 2hxy + c = 0
     this.a = directrix.b * directrix.b;
     this.b = directrix.a * directrix.a;
-    var t = this.a + this.b;
+    var t = this.b + this.a;
     this.g = -(t * focus.x + directrix.a * directrix.c);
     this.f = -(t * focus.y + directrix.b * directrix.c);
     this.h = -directrix.a * directrix.b;
@@ -106,22 +106,28 @@ function Parabola(focus, directrix) {
         return res;
     };
     this.getIntersectionWithParabola = function(parabola) {
+        var d1 = this.directrix,
+            d2 = parabola.directrix;
         //Общий фокус
         if (this.focus.equalsToPoint(parabola.focus)) {
-            var b = G.chooseBisectorInSameSectorAsFocus(this.directrix, parabola.directrix, this.focus);
-            if (b === null) {
-                return {
-                    pointAmount: 0,
-                    p: []
+            if (d1.getIntersectionWithLine(d2) === null) {
+                if (d1.arePointsOnSameSide(this.focus, d2.getPointOn()) &&
+                    d2.arePointsOnSameSide(this.focus, d1.getPointOn())) {
+                    return this.getIntersectionWithLine(G.getMidLine(d1, d2));
+                }
+                else {
+                    return {
+                        pointAmount: 0,
+                        p: []
+                    }
                 }
             }
-            else {
-                return this.getIntersectionWithLine(b);
-            }
+            var b = G.chooseBisectorInSameSectorAsFocus(d1, d2, this.focus);
+            return this.getIntersectionWithLine(b);
         }
         //Общая директриса
-        else if (this.directrix.isEqualToLine(parabola.directrix)) {
-            if (!this.directrix.arePointsOnSameSide(this.focus, parabola.focus)) {
+        else if (d1.isEqualToLine(d2)) {
+            if (!d1.arePointsOnSameSide(this.focus, parabola.focus)) {
                 return {
                     pointAmount: 0,
                     p: []
