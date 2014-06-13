@@ -90,7 +90,7 @@ var BasePolygon = (function() {
             //Сначала подозреваем все точки на параболе
             var currentPiece = new Parabola(peak.vertex, d);
             DebugDrawing.drawPoint(currentPiece.vertex, "#0f0", 3);
-            DebugDrawing.draw(currentPiece);
+            DebugDrawing.draw(currentPiece, "#cecece");
             //Затем, отсекаем всё что не лежит в полосе стороны и секторе пика
             var pieceForSide = sideCutFromParabola(side, currentPiece);
             if (pieceForSide === null) {

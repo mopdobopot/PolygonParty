@@ -26,6 +26,11 @@ var DebugDrawing = {
             Drawing.drawSegment(this.c, segment, color);
         }
     },
+    drawParabola: function(parabola, color) {
+        if (Config.debugDrawing) {
+            Drawing.drawParabola(this.c, parabola, color);
+        }
+    },
     draw: function(shape, color) {
         if (Config.debugDrawing) {
             if (Type.isLine(shape)) {
@@ -35,7 +40,7 @@ var DebugDrawing = {
                 this.drawBeam(shape);
             }
             else if (Type.isParabola(shape)) {
-                Drawing.drawParabola(this.c, shape);
+                this.drawParabola(shape, color);
             }
         }
     },

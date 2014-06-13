@@ -82,6 +82,8 @@ var Drawing = (function() {
 
     return {
 
+        c: null, //Контекст
+
         drawCoordinateSystem: function(context, width, height) {
             drawGrid(context, width, height, Config.gridColor);
             drawAxis(context, width, height, Config.axisColor);
@@ -145,9 +147,9 @@ var Drawing = (function() {
             drawPoint(context, color, point, r);
         },
 
-        drawParabola: function(context, parabola) {
-            context.strokeStyle = "#cecece";
-            /*var shift = new Vector(parabola.vertex, parabola.focus).getMulOnScalar(100);
+        drawParabola: function(context, parabola, color) {
+            context.strokeStyle = color;
+            var shift = new Vector(parabola.vertex, parabola.focus).getMulOnScalar(100);
             var x0 = parabola.vertex.getShiftedByVector(shift).x;
             //Найдётся хотя бы 1 решение, берём первое
             var y0 = parabola.getYByX(x0).root1;
@@ -160,15 +162,12 @@ var Drawing = (function() {
             else {
                 p2 = intersec.p[0];
             }
+            var tangent = parabola.getTangentInPoint(p1);
+            var controlPoint = G.getIntersection(tangent, parabola.axis);
             context.beginPath();
             context.moveTo(p1.x, p1.y);
-            context.quadraticCurveTo(parabola.focus.x, parabola.focus.y, p2.x, p2.y);
-            context.stroke();*/
-            for (var x = 0; x <= 720; x++) {
-                var y = parabola.getYByX(x);
-                drawPoint(context, "#eee", new Point(x, y.root1), 1);
-                drawPoint(context, "#eee", new Point(x, y.root2), 1);
-            }
+            context.quadraticCurveTo(controlPoint.x, controlPoint.y, p2.x, p2.y);
+            context.stroke();
         }
     }
 })();

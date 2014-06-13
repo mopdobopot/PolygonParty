@@ -11,8 +11,9 @@ function Parabola(focus, directrix) {
     //Представление y = 2px. Прежде чем искать пересечение с прямой, прямую нужно повернуть на angle и
     //сдвинуть на вектор, смотрящий из нуля в vertex. Затем, найти пересечения и сдвинуть-повернуть их обратно
     this.angle = new Vector(0, 1).getAlpha(directrix.getDirectingVector());
-    var intersec = G.getIntersection(directrix, new Line(focus, focus.getShiftedByVector(directrix.getNormalVector()))),
-        v = new Vector(focus, intersec).getMulOnScalar(0.5);
+    this.axis = new Line(focus, focus.getShiftedByVector(directrix.getNormalVector()));
+    var headPoint = G.getIntersection(directrix, this.axis);
+    var v = new Vector(focus, headPoint).getMulOnScalar(0.5);
     this.vertex = focus.getShiftedByVector(v);
     //Представление ax^2 + by^2 + 2gx + 2fy + 2hxy + c = 0
     this.a = directrix.b * directrix.b;
@@ -39,6 +40,12 @@ function Parabola(focus, directrix) {
         var b = 2 * this.f + 2 * this.h * x;
         var c = this.c + 2 * this.g * x + this.a * x * x;
         return MyMath.solveQuadratic(a, b, c);
+    };
+    this.getTangentInPoint = function(p) {
+        var a = this.a * p.x + this.h * p.y + this.g;
+        var b = this.h * p.x + this.f + this.b * p.y;
+        var c = this.g * p.x + this.f * p.y + this.c;
+        return new Line(a, b, c);
     };
     this.getIntersectionWithLine = function(line) {
         var a, b, c, res;
