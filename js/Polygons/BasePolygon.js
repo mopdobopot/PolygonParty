@@ -48,7 +48,7 @@ var BasePolygon = (function() {
                 return new ParabolicBeam(parabola, intersection, normalV.getMulOnScalar(-1));
             }
         },
-        peakCutFromCenterPerp = function(peak, centerPerp) {
+        cutPeakSectorFromLine = function(peak, centerPerp) {
             var intersec1 = G.getIntersection(centerPerp, peak.beam1),
                 intersec2 = G.getIntersection(centerPerp, peak.beam2);
             if (intersec1 === null) {
@@ -73,9 +73,31 @@ var BasePolygon = (function() {
         sideCutFromParabola = function(side, parabola) {
             var intersec1 = G.getIntersection(parabola, side.beamA),
                 intersec2 = G.getIntersection(parabola, side.beamB);
-            //Сторона содержится в директрисе параболы => intersec1 и intersec2 содержат ровно по одной точке
+            //Сторона содержится в директрисе параболы => intersec1 и intersec2 содержат одновременно
+            //по одной точке или не содержат точек вовсе
+            if (intersec1.pointAmount === 0) {
+                return null;
+            }
             return G.getIntersection(chooseParabolicBeam(parabola, intersec1.p[0], side.beamA, side.beamB),
                                      chooseParabolicBeam(parabola, intersec2.p[0], side.beamB, side.beamA));
+        },
+        //Возвращает @ParabolicSegment или null
+        getPieceForPeakSide = function(peak, side) {
+            var d = new Line(side.a, side.b);
+            if (d.isPointOn(peak.vertex)) {
+                return null;
+            }
+            //Сначала подозреваем все точки на параболе
+            var currentPiece = new Parabola(peak.vertex, d);
+            DebugDrawing.drawPoint(currentPiece.vertex, "#0f0", 3);
+            DebugDrawing.draw(currentPiece);
+            //Затем, отсекаем всё что не лежит в полосе стороны и секторе пика
+            var pieceForSide = sideCutFromParabola(side, currentPiece);
+            if (pieceForSide === null) {
+                return null;
+            }
+            var pieceForPeak = peakCutFromParabola(peak, currentPiece);
+            return G.getIntersection(pieceForPeak, pieceForSide);
         },
         //Возвращает @Beam, @Segment или null
         getPieceForPeakPeak = function(peak1, peak2) {
@@ -83,112 +105,119 @@ var BasePolygon = (function() {
                 return null;
             }
             var seg = new Segment(peak1.vertex, peak2.vertex);
+            DebugDrawing.drawSegment(seg, "#ddd");
             var center = seg.getCenter();
+            DebugDrawing.drawPoint(center, "#666", 0.8);
             //Сначала подозреваем все точки на серединном перпендикуляре
-            var currentPiece = seg.getCentralPerpendicular();
+            var centerPerp = seg.getCentralPerpendicular();
+            DebugDrawing.draw(centerPerp, "#aaa");
             //Затем, отсекаем всё что не лежит в секторах пиков
-            var pieceForPeak1 = peakCutFromCenterPerp(peak1, currentPiece, center);
-            var pieceForPeak2 = peakCutFromCenterPerp(peak2, currentPiece, center);
+            var pieceForPeak1 = cutPeakSectorFromLine(peak1, centerPerp, center);
+            DebugDrawing.draw(pieceForPeak1);
+            var pieceForPeak2 = cutPeakSectorFromLine(peak2, centerPerp, center);
+            DebugDrawing.draw(pieceForPeak2);
             return G.getIntersection(pieceForPeak1, pieceForPeak2);
         },
-        //Возвращает @ParabolicSegment или null
-        getPieceForPeakSide = function(peak, side) {
-            var d = new Line(side.a, side.b);
-            if (d.isPointOnLine(peak.vertex)) {
-                return null;
-            }
-            //Сначала подозреваем все точки на параболе
-            var currentPiece = new Parabola(peak, d),
-                //Затем, отсекаем всё что не лежит в полосе стороны и секторе пика
-                pieceForSide = sideCutFromParabola(side, currentPiece);
-            if (pieceForSide === null) {
-                return null;
-            }
-            var pieceForPeak = peakCutFromParabola(peak, currentPiece);
-            return G.getIntersection(pieceForPeak, pieceForSide);
-        },
-        applyPeakEffect = function(peak, effectPeak, currentPiece) {
+        peakOnPeakPeakEffect = function(peak, effectPeak, currentPiece) {
             if (currentPiece === null) {
                 return null;
             }
-            var effectPiece, intersec, effectCenterPerp, pointOnCurrentPiece, beam, v;
-            effectPiece = getPieceForPeakPeak(peak, effectPeak);
-            if (effectPiece === null) {
-                return currentPiece;
-            }
-            else {
-                intersec = G.getIntersection(currentPiece, effectPiece);
-                //intersec это @Point или null (TODO порисовать, убедиться)
-                effectCenterPerp = new Segment(peak.vertex, effectPeak.vertex).getCentralPerpendicular();
-                pointOnCurrentPiece = currentPiece.getPointOn();
-                if (intersec === null) {
+            var effectPiece = getPieceForPeakPeak(peak, effectPeak);
+            if (effectPiece != null) {
+                var effectCenterPerp = new Segment(peak.vertex, effectPeak.vertex).getCentralPerpendicular();
+                var intersec = G.getIntersection(currentPiece, effectCenterPerp);
+                //intersec это @Point или null
+                var pointOnCurrentPiece = currentPiece.getPointOn();
+                if (intersec === null || intersec.pointAmount === 0) {
                     //Если currentPiece целиком лежит ближе к effectPeak чем к peak, то currentPiece — пуст,
                     //иначе, effectPeak не оказывает влияния на currentPiece
                     return effectCenterPerp.arePointsOnSameSide(effectPeak.vertex, pointOnCurrentPiece) ? null
-                                                                                                        : currentPiece;
+                        : currentPiece;
                 }
                 else {
                     //Выбираем направление на которое не влияет effectPeak
-                    v = new Vector(intersec, pointOnCurrentPiece);
+                    var v = new Vector(intersec, pointOnCurrentPiece);
                     if (effectCenterPerp.arePointsOnSameSide(effectPeak.vertex, pointOnCurrentPiece)) {
                         v = v.getMulOnScalar(-1);
                     }
-                    beam = new Beam(intersec, v);
+                    var beam = new Beam(intersec, v);
                     return G.getIntersection(currentPiece, beam);
                 }
             }
+            return currentPiece;
         },
-        applySideEffect = function(peak, effectSide, currentPiece) {
+        sideOnPeakPeakEffect = function(peak, effectSide, currentPiece) {
             if (currentPiece === null) {
                 return null;
             }
-            var effectPiece, intersec, effectParabola, pointOnCurrentPiece, s, p;
-            effectPiece = getPieceForPeakSide(peak, effectSide);
-            if (effectPiece === null) {
-                return currentPiece;
-            }
-            else {
-                intersec = G.getIntersection(currentPiece, effectPiece);
-                //intersec это @Point или null (TODO порисовать, убедиться)
-                effectParabola = new Parabola(peak.vertex, new Line(effectSide.a, effectSide.b));
-                pointOnCurrentPiece = currentPiece.getPointOn();
-                if (intersec === null) {
+            var effectPiece = getPieceForPeakSide(peak, effectSide);
+            if (effectPiece != null) {
+                var effectParabola = new Parabola(peak.vertex, new Line(effectSide.a, effectSide.b));
+                DebugDrawing.draw(effectParabola);
+                var intersec = G.getIntersection(currentPiece, effectParabola);
+                //intersec это @Point x2, @Point или null
+                if (intersec.pointAmount === 0) {
                     //Если отрезок соединияющий фокус effectParabola с точкой на currentPiece пересекает параболу,
                     //то currentPiece целиком ближе к effectSide, иначе effectSide не оказывает эффекта
-                    s = new Segment(peak.vertex, pointOnCurrentPiece);
+                    var s = new Segment(peak.vertex, currentPiece.getPointOn());
                     return G.getIntersection(s, effectParabola) != null ? null
                                                                         : currentPiece;
                 }
-                else {
-                    //Пока только для пар пик-пик
-                    p = intersec.getShiftedByVector(currentPiece.getDirectingVector());
-                    s = new Segment(p, peak.vertex);
+                else if (intersec.pointAmount === 1) {
                     var directingV = currentPiece.getDirectingVector();
-                    if (G.getIntersection(s, effectParabola) != null) {
+                    decreaseShiftingVector(effectParabola, intersec.p[0], directingV);
+                    var p = intersec.p[0].getShiftedByVector(directingV);
+                    s = new Segment(p, peak.vertex);
+                    var x = G.getIntersection(s, effectParabola);
+                    if (x.pointAmount != 0) {
                         directingV = directingV.getMulOnScalar(-1);
                     }
-                    return G.getIntersection(currentPiece, new Beam(intersec, directingV));
-                }
-            }
-        },
-        getBestAlphaForPeakPeak = function(currentPiece, peak1, peak2) {
-            var v1, v2;
-            if (Type.isSegment(currentPiece)) {
-                v1 = new Vector(currentPiece.a, peak1.vertex);
-                v2 = new Vector(currentPiece.b, peak1.vertex);
-                if (v1.getModule() > v2.getModule()) {
-                    v1 = v2;
-                    v2 = new Vector(currentPiece.b, peak2.vertex);
+                    return G.getIntersection(currentPiece, new Beam(intersec.p[0], directingV));
                 }
                 else {
-                    v2 = new Vector(currentPiece.a, peak2.vertex);
+                    //TODO парабола пересекает currentPiece в двух точках
                 }
-                return v1.getAlpha(v2);
+            }
+            return currentPiece;
+        },
+        //Уменьшает длину вектора, начинающегося в точке point, чтобы не выскочить за параболу
+        decreaseShiftingVector = function(parabola, point, vector) {
+            vector = vector.getNormalized();
+            var l = new Line(point, point.getShiftedByVector(vector));
+            var x = G.getIntersection(l, parabola);
+            //Вектор параллельный оси параболы не требует укорачивания
+            if (x.pointAmount === 2) {
+                var k = new Vector(x.p[0], x.p[1]).getModule() / 2;
+                vector = vector.getMulOnScalar(k);
+            }
+            return vector;
+        },
+        //Выбирает точку ближайшую к середине отрезка, соединяющего пики и вычисляет для неё альфа
+        getBestAlphaForPeakPeak = function(currentPiece, peak1, peak2) {
+            if (Type.isSegment(currentPiece)) {
+                var center = new Segment(peak1.vertex, peak2.vertex).getCenter();
+                if (currentPiece.isPointOn(center)) {
+                    var v1 = new Vector(center, peak1.vertex);
+                    var v2 = new Vector(center, peak2.vertex);
+                    return v1.getMinAlpha(v2);
+                }
+                else {
+                    v1 = new Vector(currentPiece.a, peak1.vertex);
+                    v2 = new Vector(currentPiece.b, peak1.vertex);
+                    if (v1.getModule() > v2.getModule()) {
+                        v1 = v2;
+                        v2 = new Vector(currentPiece.b, peak2.vertex);
+                    }
+                    else {
+                        v2 = new Vector(currentPiece.a, peak2.vertex);
+                    }
+                    return v1.getMinAlpha(v2);
+                }
             }
             else if (Type.isBeam(currentPiece)) {
                 v1 = new Vector(currentPiece.point, peak1.vertex);
                 v2 = new Vector(currentPiece.point, peak2.vertex);
-                return v1.getAlpha(v2);
+                return v1.getMinAlpha(v2);
             }
         };
 
@@ -263,44 +292,47 @@ var BasePolygon = (function() {
             var preCalc = calcSidesAndPeaks(this.vertexes);
             this.sides = preCalc.sides;
             this.peaks = preCalc.peaks;
-            var maxAlpha = 0,
-                lp = this.peaks.length,
-                ls = this.sides.length,
-                pi, pj, pk, sk, currentPiece; //currentPiece — множество подозреваемых точек
+            var maxAlpha = 0;
+            var lp = this.peaks.length;
+            var ls = this.sides.length;
             //Перебор всех пар несоседних пиков
             for (var i = 0; i < lp - 1; i++) {
                 for (var j = i + 1; j < lp; j++) {
-                    pi = this.peaks[i];
-                    pj = this.peaks[j];
-                    currentPiece = getPieceForPeakPeak(pi, pj);
+                    var pi = this.peaks[i];
+                    var pj = this.peaks[j];
+                    var currentPiece = getPieceForPeakPeak(pi, pj);
                     //Если пересечение пусто, то пара пиков не представляет интереса. Иначе:
                     if (currentPiece != null) {
-                        //Влияние остальных пиков на выделенный промежуток
+                        //Влияние пиков на пару пик-пик
                         for (var k = 0; k < lp; k++) {
-                            pk = this.peaks[k];
-                            if (!pk.vertex.equalsToPoint(pi) && !pk.vertex.equalsToPoint(pj)) {
-                                currentPiece = applyPeakEffect(pi, pk, currentPiece);
-                                currentPiece = applyPeakEffect(pj, pk, currentPiece);
+                            if (k != i && k != j) {
+                                var pk = this.peaks[k];
+                                if (!pi.isNeighbour(pk)) {
+                                    currentPiece = peakOnPeakPeakEffect(pi, pk, currentPiece);
+                                }
+                                if (!pj.isNeighbour(pk)) {
+                                    currentPiece = peakOnPeakPeakEffect(pj, pk, currentPiece);
+                                }
                                 if (currentPiece === null) break;
                             }
                         }
-                        //Если множество пусто, переходим к следующей паре
+                        //Если множество пусто, переходим к следующей паре пиков
                         if (currentPiece === null) continue;
-                        //Влияние сторон на выделенный промежуток
+                        //Влияние сторон на пару пик-пик
                         for (k = 0; k < ls; k++) {
-                            sk = this.sides[k];
-                            if (!pi.equalsToPoint(sk.a) && !pi.equalsToPoint(sk.b)) {
-                                currentPiece = applySideEffect(pi, sk, currentPiece);
-                                if (currentPiece === null) break;
+                            var sk = this.sides[k];
+                            if (!pi.vertex.equalsToPoint(sk.a) && !pi.vertex.equalsToPoint(sk.b) &&
+                                !pj.vertex.equalsToPoint(sk.a) && !pj.vertex.equalsToPoint(sk.b)) {
+                                currentPiece = sideOnPeakPeakEffect(pi, sk, currentPiece);
+                                currentPiece = sideOnPeakPeakEffect(pj, sk, currentPiece);
                             }
-                            if (!pj.equalsToPoint(sk.a) && !pj.equalsToPoint(sk.b)) {
-                                currentPiece = applySideEffect(pj, sk, currentPiece);
-                                if (currentPiece === null) break;
-                            }
+                            if (currentPiece === null) break;
                         }
-                        //Выбор точки на CurrentPiece для вычисления заветного угла
-                        var currentAlpha = getBestAlphaForPeakPeak(currentPiece, pi, pj);
-                        maxAlpha = Math.max(maxAlpha, currentAlpha);
+                        if (currentPiece != null) {
+                            //Выбор точки на CurrentPiece для вычисления заветного угла
+                            var currentAlpha = getBestAlphaForPeakPeak(currentPiece, pi, pj);
+                            maxAlpha = Math.max(maxAlpha, currentAlpha);
+                        }
                     }
                 }
             }

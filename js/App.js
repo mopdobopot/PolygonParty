@@ -17,6 +17,7 @@ $(document).ready(function() {
         csCanvas = document.getElementById(coordinateSystemCanvasId),
         csContext = csCanvas.getContext("2d");
 
+    DebugDrawing.c = context;
     csCanvas.width = w;
     csCanvas.height = h;
     Drawing.drawCoordinateSystem(csContext, w, h);

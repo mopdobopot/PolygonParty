@@ -21,6 +21,11 @@ function Segment(p1, p2) {
     this.getPointOn = function() {
         return this.a;
     };
+    this.isPointOn = function(point) {
+        var v1 = new Vector(this.a, point);
+        var v2 = new Vector(this.b, point);
+        return new Line(this.a, this.b).isPointOn(point) && v1.getVectorProduct(v2) < 0;
+    };
     this.getDirectingVector = function() {
         return new Vector(this.a, this.b);
     };
@@ -31,8 +36,8 @@ function Segment(p1, p2) {
         return new Point((this.a.x + this.b.x) / 2, (this.a.y + this.b.y) / 2);
     };
     this.getCentralPerpendicular = function() {
-        var a = this.b.x - this.a.x,
-            b = this.b.y - this.a.y,
+        var a = 2 * (this.b.x - this.a.x),
+            b = 2 * (this.b.y - this.a.y),
             c = this.a.x * this.a.x + this.a.y * this.a.y - this.b.x * this.b.x - this.b.y * this.b.y;
         return new Line(a, b, c);
     };

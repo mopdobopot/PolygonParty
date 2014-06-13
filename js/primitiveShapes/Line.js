@@ -52,15 +52,20 @@ function Line(a, b, c) {
     this.isEqualToLine = function(line) {
         return this.getIntersectionWithLine(line) === Infinity;
     };
-    this.isPointOnLine = function(point) {
-        return point.y === this.m * point.x + this.n;
+    this.isPointOn = function(point) {
+        if (this.isXConst) {
+            return Math.abs(point.x - this.x) < Config.eps;
+        }
+        else {
+            return Math.abs(point.y - this.m * point.x - this.n) < Config.eps;
+        }
     };
     //Может вернуть @Point, infinity или null
     this.getIntersectionWithLine = function(line) {
         var d = line.a * this.b - this.a * line.b;
-        if (d === 0) {
-            return (this.a * line.c - this.c * line.a === 0 &&
-                    this.b * line.c - this.c * line.b === 0) ? Infinity : null;
+        if (Math.abs(d) < Config.eps) {
+            return (Math.abs(this.a * line.c - this.c * line.a) < Config.linesEqualsEps &&
+                    Math.abs(this.b * line.c - this.c * line.b) < Config.linesEqualsEps) ? Infinity : null;
         }
         var x = (this.c * line.b - line.c * this.b) / d,
             y = (this.a * line.c - line.a * this.c) / d;

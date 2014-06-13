@@ -108,6 +108,67 @@ var Drawing = (function() {
             if (isVertexNumberNeeded) {
                 drawPointNumber(context, vertexes[l - 1], l - 1);
             }
+        },
+
+        drawLine: function(context, line, color) {
+            context.strokeStyle = color;
+            context.beginPath();
+            var v = line.getDirectingVector().getMulOnScalar(1000);
+            var p1 = line.getPointOn().getShiftedByVector(v);
+            var p2 = line.getPointOn().getShiftedByVector(v.getMulOnScalar(-1));
+            context.moveTo(p1.x, p1.y);
+            context.lineTo(p2.x, p2.y);
+            context.stroke();
+        },
+
+        drawBeam: function(context, beam) {
+            context.strokeStyle = "#a33";
+            context.beginPath();
+            var v = beam.getDirectingVector().getMulOnScalar(1000);
+            var p1 = beam.point;
+            var p2 = beam.point.getShiftedByVector(v);
+            context.moveTo(p1.x, p1.y);
+            drawPoint(context, "#a33", p1, Config.vertexRadius);
+            context.lineTo(p2.x, p2.y);
+            context.stroke();
+        },
+
+        drawSegment: function(context, segment, color) {
+            context.strokeStyle = color;
+            context.beginPath();
+            context.moveTo(segment.a.x, segment.a.y);
+            context.lineTo(segment.b.x, segment.b.y);
+            context.stroke();
+        },
+
+        drawPoint: function(context, point, color, r) {
+            drawPoint(context, color, point, r);
+        },
+
+        drawParabola: function(context, parabola) {
+            context.strokeStyle = "#cecece";
+            /*var shift = new Vector(parabola.vertex, parabola.focus).getMulOnScalar(100);
+            var x0 = parabola.vertex.getShiftedByVector(shift).x;
+            //Найдётся хотя бы 1 решение, берём первое
+            var y0 = parabola.getYByX(x0).root1;
+            var p1 = new Point(x0, y0);
+            var l = new Line(p1, p1.getShiftedByVector(parabola.directrix.getDirectingVector()));
+            var intersec = G.getIntersection(parabola, l);
+            if (intersec.p[0].equalsToPoint(p1)) {
+                var p2 = intersec.p[1];
+            }
+            else {
+                p2 = intersec.p[0];
+            }
+            context.beginPath();
+            context.moveTo(p1.x, p1.y);
+            context.quadraticCurveTo(parabola.focus.x, parabola.focus.y, p2.x, p2.y);
+            context.stroke();*/
+            for (var x = 0; x <= 720; x++) {
+                var y = parabola.getYByX(x);
+                drawPoint(context, "#eee", new Point(x, y.root1), 1);
+                drawPoint(context, "#eee", new Point(x, y.root2), 1);
+            }
         }
     }
 })();

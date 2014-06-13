@@ -7,7 +7,7 @@
 function Parabola(focus, directrix) {
     this.focus = focus;
     this.directrix = directrix;
-    this.directrixNormalVector = new Vector(-directrix.b, directrix.a);
+    this.directrixNormalVector = directrix.getNormalVector();
     //Представление y = 2px. Прежде чем искать пересечение с прямой, прямую нужно повернуть на angle и
     //сдвинуть на вектор, смотрящий из нуля в vertex. Затем, найти пересечения и сдвинуть-повернуть их обратно
     this.angle = new Vector(0, 1).getAlpha(directrix.getDirectingVector());
@@ -25,6 +25,20 @@ function Parabola(focus, directrix) {
 
     this.getPointOn = function() {
         return this.focus;
+    };
+    this.isPointOn = function(point) {
+        return Math.abs(this.a * point.x * point.x +
+                        this.b * point.y * point.y +
+                        2 * this.g * point.x +
+                        2 * this.f * point.y +
+                        2 * this.h * point.x * point.y +
+                        this.c) < Config.pointOnParabolaEps;
+    };
+    this.getYByX = function(x) {
+        var a = this.b;
+        var b = 2 * this.f + 2 * this.h * x;
+        var c = this.c + 2 * this.g * x + this.a * x * x;
+        return MyMath.solveQuadratic(a, b, c);
     };
     this.getIntersectionWithLine = function(line) {
         var a, b, c, res;
@@ -75,39 +89,41 @@ function Parabola(focus, directrix) {
     };
     this.getIntersectionWithBeam = function(beam) {
         var intersec = this.getIntersectionWithLine(beam.line);
-        if (intersec.pointAmount === 0)
+        if (intersec.pointAmount === 0) {
             return intersec;
-        var res = {
-            pointAmount: 0,
-            p: []
-        };
+        }
+        var p = [];
         for (var i = 0; i < intersec.p.length; i++) {
             if (intersec.p[i].isOnBeam(beam)) {
-                res.pointAmount++;
-                res.p.push(intersec.p[i]);
+                p.push(intersec.p[i]);
             }
         }
-        return res;
+        return {
+            pointAmount: p.length,
+            p: p
+        };
     };
     this.getIntersectionWithSegment = function(segment) {
-        var intersec = this.getIntersectionWithLine(beam.line);
+        var intersec = this.getIntersectionWithLine(segment.getLine());
         if (intersec.pointAmount === 0)
             return intersec;
-        var res = {
-            pointAmount: 0,
-            p: []
-        };
+        var p = [];
         for (var i = 0; i < intersec.p.length; i++) {
             if (intersec.p[i].isOnSegment(segment)) {
-                res.pointAmount++;
-                res.p.push(intersec.p[i]);
+                p.push(intersec.p[i]);
             }
         }
-        return res;
+        return {
+            pointAmount: p.length,
+            p: p
+        };
     };
     this.getIntersectionWithParabola = function(parabola) {
         var d1 = this.directrix,
             d2 = parabola.directrix;
+        if (G.getIntersection(d1, d2) === Infinity && this.focus.equalsToPoint(parabola.focus)) {
+            return Infinity;
+        }
         //Общий фокус
         if (this.focus.equalsToPoint(parabola.focus)) {
             if (d1.getIntersectionWithLine(d2) === null) {

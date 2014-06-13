@@ -9,7 +9,7 @@ function Point(x, y) {
     this.y = y;
 
     this.equalsToPoint = function(p) {
-        return (this.x === p.x) && (this.y === p.y);
+        return (Math.abs(this.x - p.x) < Config.eps) && (Math.abs(this.y - p.y) < Config.eps);
     };
     this.distToPoint = function(p) {
         return Math.sqrt((p.x - this.x) * (p.x - this.x) + (p.y - this.y) * (p.y - this.y));
@@ -37,7 +37,7 @@ function Point(x, y) {
         return new Point(this.x * scalar, this.y * scalar);
     };
     this.isOnLine = function(line) {
-        return line.a * this.x + line.b * this.y + line.c === 0;
+        return line.isPointOn(this);
     };
     this.isOnSegment = function(segment) {
         var ap = new Vector(segment.a, this),

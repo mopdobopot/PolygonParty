@@ -21,6 +21,10 @@ function Vector(a, b) {
     this.getModule = function() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     };
+    this.getNormalized = function() {
+        var m = this.getModule();
+        return new Vector(this.getMulOnScalar(1 / m));
+    };
     this.getSum = function(v) {
         return new Vector(this.x + v.x, this.y + v.y);
     };
@@ -42,9 +46,7 @@ function Vector(a, b) {
     };
     //От текущего до v, по часовой стрелке
     this.getAlpha = function(v) {
-        var alpha = Math.acos(this.getScalarProduct(v)
-                            / this.module
-                            / v.module),
+        var alpha = this.getMinAlpha(v),
             vp = this.getVectorProduct(v);
         if (vp >= 0) {
             return alpha;
@@ -53,7 +55,14 @@ function Vector(a, b) {
             return (2 * Math.PI - alpha);
         }
     };
+    this.getMinAlpha = function(v) {
+        var cos = this.getScalarProduct(v) / this.module / v.module;
+        cos = (cos > 1) ? 1
+                        : (cos < -1) ? -1
+                                     : cos;
+        return Math.acos(cos);
+    };
     this.sameDirected = function(v) {
-        return this.getVectorProduct(v) === 0 && this.getScalarProduct(v) > 0;
+        return Math.abs(this.getMinAlpha(v)) < Config.sameDirectingEps;
     }
 }

@@ -281,6 +281,12 @@ var G = (function() {
                 else if (Type.isParabola(b)) {
                     return b.getIntersectionWithLine(a);
                 }
+                else if (Type.isParabolicBeam(b)) {
+                    return b.getIntersectionWithOtherShape(a);
+                }
+                else if (Type.isParabolicSegment(b)) {
+                    return b.getIntersectionWithOtherShape(a);
+                }
             }
             else if (Type.isBeam(a)) {
                 if (Type.isLine(b)) {
@@ -290,10 +296,16 @@ var G = (function() {
                     return a.getIntersectionWithBeam(b);
                 }
                 else if (Type.isSegment(b)) {
-                    return b.getIntersectionWithBeam(b);
+                    return b.getIntersectionWithBeam(a);
                 }
                 else if (Type.isParabola(b)) {
                     return b.getIntersectionWithBeam(a);
+                }
+                else if (Type.isParabolicBeam(b)) {
+                    return b.getIntersectionWithOtherShape(a);
+                }
+                else if (Type.isParabolicSegment(b)) {
+                    return b.getIntersectionWithOtherShape(a);
                 }
             }
             else if (Type.isSegment(a)) {
@@ -309,10 +321,16 @@ var G = (function() {
                 else if (Type.isParabola(b)) {
                     return b.getIntersectionWithSegment(a);
                 }
+                else if (Type.isParabolicBeam(b)) {
+                    return b.getIntersectionWithOtherShape(a);
+                }
+                else if (Type.isParabolicSegment(b)) {
+                    return b.getIntersectionWithOtherShape(a);
+                }
             }
             else if (Type.isParabola(a)) {
                 if (Type.isLine(b)) {
-                    return a.getIntersectionWithSegment(b);
+                    return a.getIntersectionWithLine(b);
                 }
                 else if (Type.isBeam(b)) {
                     return a.getIntersectionWithBeam(b);
@@ -323,10 +341,27 @@ var G = (function() {
                 else if (Type.isParabola(b)) {
                     return b.getIntersectionWithParabola(a);
                 }
+                else if (Type.isParabolicBeam(b)) {
+                    return b.getIntersectionWithOtherShape(a);
+                }
+                else if (Type.isParabolicSegment(b)) {
+                    return b.getIntersectionWithOtherShape(a);
+                }
             }
             else if (Type.isParabolicBeam(a)) {
                 if (Type.isParabolicBeam(b)) {
                     return a.getIntersectionWithParabolicBeam(b);
+                }
+                else if (Type.isParabolicSegment(b)) {
+                    return a.getIntersectionWithParabolicSegment(b);
+                }
+                else {
+                    return a.getIntersectionWithOtherShape(b);
+                }
+            }
+            else if (Type.isParabolicSegment(a)) {
+                if (Type.isParabolicBeam(b)) {
+                    return b.getIntersectionWithParabolicSegment(a);
                 }
                 else if (Type.isParabolicSegment(b)) {
                     return a.getIntersectionWithParabolicSegment(b);

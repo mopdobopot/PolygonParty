@@ -4,6 +4,8 @@
  * Time: 14:31
  */
 var Config = {
+    debugDrawing: true,
+
     polygonFileName: "p",
 
     polygonColor: "#000",
@@ -15,5 +17,15 @@ var Config = {
     vertexRadius: 2.1,
     clickedVertexRadius: 1.6,
 
-    stretchingEps: 0.0000001
+    eps: 0.00001,
+    //Точность, с которой точка считается лежащей на параболе
+    pointOnParabolaEps: 0.0001,
+    quadraticEquationEps: 0.000001,
+    //Угол, примерно равный 0.06 градуса, считается за 0 при определении сонаправленности векторов
+    sameDirectingEps: 0.001,
+    //Точность "выпукливания" звёздчатого многоугольника
+    stretchingEps: 0.0000001,
+    //Точность определения совпадения прямых
+    linesEqualsEps: 0.0001,
+    linesParallelEps: this.eps
 };

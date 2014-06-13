@@ -5,8 +5,8 @@
  */
 var MyMath = {
     solveQuadratic: function(a, b, c) {
-        if (a === 0) {
-            if (b === 0)
+        if (Math.abs(a) < Config.quadraticEquationEps) {
+            if (Math.abs(b) < Config.quadraticEquationEps)
                 throw new Error("Квадратное уравнение задано неверно: a = 0 и b = 0");
             return {
                 rootAmount: 1,
@@ -18,7 +18,7 @@ var MyMath = {
             return {
                 rootAmount: 0
             };
-        if (d === 0)
+        if (Math.abs(d) < Config.quadraticEquationEps)
             return {
                 rootAmount: 1,
                 root: -b / (2 * a)
