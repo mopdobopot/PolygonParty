@@ -36,19 +36,6 @@ function Point(x, y) {
     this.getMulOnScalar = function(scalar) {
         return new Point(this.x * scalar, this.y * scalar);
     };
-    this.isOnLine = function(line) {
-        return line.isPointOn(this);
-    };
-    this.isOnSegment = function(segment) {
-        var ap = new Vector(segment.a, this),
-            bp = new Vector(segment.b, this);
-        return this.isOnLine(segment.getLine()) &&
-               !ap.sameDirected(bp);
-    };
-    this.isOnBeam = function(beam) {
-        return this.isOnLine(beam.line) &&
-               beam.vector.sameDirected(new Vector(beam.point, this));
-    };
     this.getRotated = function(phi) {
         var newX = this.x * Math.cos(phi) - this.y * Math.sin(phi),
             newY = this.x * Math.sin(phi) + this.y * Math.cos(phi);

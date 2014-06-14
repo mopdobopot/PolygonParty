@@ -82,18 +82,16 @@ var Drawing = (function() {
 
     return {
 
-        c: null, //Контекст
+        c: null, //Контекст холста
 
         drawCoordinateSystem: function(context, width, height) {
             drawGrid(context, width, height, Config.gridColor);
             drawAxis(context, width, height, Config.axisColor);
         },
-
         clearCanvas: function(context, width, height) {
             context.clearRect(0, 0, width, height);
             $('#infoTable').html("");
         },
-
         drawPolygon: function(vertexes, context, width, height, isVertexNumberNeeded) {
             this.clearCanvas(context, width, height);
             var l = vertexes.length,
@@ -111,63 +109,80 @@ var Drawing = (function() {
                 drawPointNumber(context, vertexes[l - 1], l - 1);
             }
         },
-
-        drawLine: function(context, line, color) {
-            context.strokeStyle = color;
-            context.beginPath();
+        drawLine: function(line, color, context) {
+            var c = context || this.c;
             var v = line.getDirectingVector().getMulOnScalar(1000);
             var p1 = line.getPointOn().getShiftedByVector(v);
             var p2 = line.getPointOn().getShiftedByVector(v.getMulOnScalar(-1));
-            context.moveTo(p1.x, p1.y);
-            context.lineTo(p2.x, p2.y);
-            context.stroke();
+            c.beginPath();
+            c.strokeStyle = color;
+            c.moveTo(p1.x, p1.y);
+            c.lineTo(p2.x, p2.y);
+            c.stroke();
         },
-
-        drawBeam: function(context, beam) {
-            context.strokeStyle = "#a33";
-            context.beginPath();
+        drawBeam: function(beam, color, context) {
+            var c = context || this.c;
             var v = beam.getDirectingVector().getMulOnScalar(1000);
             var p1 = beam.point;
             var p2 = beam.point.getShiftedByVector(v);
-            context.moveTo(p1.x, p1.y);
-            drawPoint(context, "#a33", p1, Config.vertexRadius);
-            context.lineTo(p2.x, p2.y);
-            context.stroke();
+            this.drawPoint(p1, "#a33", Config.vertexRadius, c);
+            c.beginPath();
+            c.strokeStyle = color;
+            c.moveTo(p1.x, p1.y);
+            c.lineTo(p2.x, p2.y);
+            c.stroke();
         },
-
-        drawSegment: function(context, segment, color) {
-            context.strokeStyle = color;
-            context.beginPath();
-            context.moveTo(segment.a.x, segment.a.y);
-            context.lineTo(segment.b.x, segment.b.y);
-            context.stroke();
+        drawSegment: function(segment, color, context) {
+            var c = context || this.c;
+            c.strokeStyle = color;
+            c.beginPath();
+            c.moveTo(segment.a.x, segment.a.y);
+            c.lineTo(segment.b.x, segment.b.y);
+            c.stroke();
         },
-
-        drawPoint: function(context, point, color, r) {
-            drawPoint(context, color, point, r);
+        drawPoint: function(point, color, r, context) {
+            var c = context || this.c;
+            if (!r) {
+                r = point.isClicked ? Config.clickedVertexRadius : Config.vertexRadius;
+            }
+            c.beginPath();
+            c.strokeStyle = color;
+            c.arc(point.x, point.y, r, 0, 2 * Math.PI, false);
+            c.closePath();
+            c.fill();
         },
-
-        drawParabola: function(context, parabola, color) {
-            context.strokeStyle = color;
-            var shift = new Vector(parabola.vertex, parabola.focus).getMulOnScalar(100);
-            var x0 = parabola.vertex.getShiftedByVector(shift).x;
-            //Найдётся хотя бы 1 решение, берём первое
-            var y0 = parabola.getYByX(x0).root1;
-            var p1 = new Point(x0, y0);
-            var l = new Line(p1, p1.getShiftedByVector(parabola.directrix.getDirectingVector()));
+        drawParabola: function(parabola, color, context) {
+            var c = context || this.c;
+            this.drawPoint(parabola.vertex, "#0f0", 1.5, c);
+            var shift = new Vector(parabola.vertex, parabola.focus).getNormalized().getMulOnScalar(800);
+            var t = parabola.vertex.getShiftedByVector(shift);
+            var l = new Line(t, t.getShiftedByVector(parabola.directrix.getDirectingVector()));
             var intersec = G.getIntersection(parabola, l);
-            if (intersec.p[0].equalsToPoint(p1)) {
-                var p2 = intersec.p[1];
-            }
-            else {
-                p2 = intersec.p[0];
-            }
+            //Прямая l точно пересечёт параболу в двух точках
+            var p1 = intersec.p[0];
+            var p2 = intersec.p[1];
             var tangent = parabola.getTangentInPoint(p1);
             var controlPoint = G.getIntersection(tangent, parabola.axis);
-            context.beginPath();
-            context.moveTo(p1.x, p1.y);
-            context.quadraticCurveTo(controlPoint.x, controlPoint.y, p2.x, p2.y);
-            context.stroke();
+            c.beginPath();
+            c.strokeStyle = color;
+            c.moveTo(p1.x, p1.y);
+            c.quadraticCurveTo(controlPoint.x, controlPoint.y, p2.x, p2.y);
+            c.stroke();
+        },
+        draw: function(shape, color, context) {
+            var c = context || this.c;
+            if (Type.isLine(shape)) {
+                this.drawLine(shape, color, c);
+            }
+            else if (Type.isBeam(shape)) {
+                this.drawBeam(shape, color, c);
+            }
+            else if (Type.isParabola(shape)) {
+                this.drawParabola(shape, color, c);
+            }
+            else if (Type.isSegment(shape)) {
+                this.drawSegment(shape, color, c);
+            }
         }
     }
 })();

@@ -22,9 +22,12 @@ function Segment(p1, p2) {
         return this.a;
     };
     this.isPointOn = function(point) {
+        if (point.equalsToPoint(this.a) || point.equalsToPoint(this.b)) {
+            return true;
+        }
         var v1 = new Vector(this.a, point);
         var v2 = new Vector(this.b, point);
-        return new Line(this.a, this.b).isPointOn(point) && v1.getVectorProduct(v2) < 0;
+        return this.getLine().isPointOn(point) && v1.getScalarProduct(v2) < 0;
     };
     this.getDirectingVector = function() {
         return new Vector(this.a, this.b);
@@ -49,12 +52,12 @@ function Segment(p1, p2) {
             return null;
         }
         else if (Type.isPoint(intersec)) {
-            return intersec.isOnSegment(this) ? intersec : null;
+            return this.isPointOn(intersec) ? intersec : null;
         }
         else if (Type.isBeam(intersec)) {
             var pa = new Vector(intersec.point, this.a);
             //Вершина луча лежит на отрезке
-            if (intersec.point.isOnSegment(this)) {
+            if (this.isPointOn(intersec.point)) {
                 return pa.sameDirected(intersec.vector) ? new Segment(intersec.point, this.a)
                                                         : new Segment(intersec.point, this.b);
             }
@@ -112,8 +115,8 @@ function Segment(p1, p2) {
             }
         }
         else {
-            return intersec.isOnSegment(this) && intersec.isOnSegment(segment) ? intersec
-                                                                               : null;
+            return this.isPointOn(intersec) && segment.isPointOn(intersec) ? intersec
+                                                                           : null;
         }
     }
 }

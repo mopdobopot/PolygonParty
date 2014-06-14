@@ -18,6 +18,7 @@ var Config = {
     clickedVertexRadius: 1.6,
 
     eps: 0.00001,
+    zeroPointEps: 0.0000001,
     //Точность, с которой точка считается лежащей на параболе
     pointOnParabolaEps: 0.0001,
     quadraticEquationEps: 0.000001,

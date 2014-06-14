@@ -215,8 +215,8 @@ var G = (function() {
             }
         },
 
-        //Выбирает из двух биссектрис одну — проходящую через область в которой лежит фокус
-        chooseBisectorInSameSectorAsFocus: function(line1, line2, focus) {
+        //Возвращает биссектрису, проходящую через область в которой лежит точка
+        chooseBisectorInSameSectorAsPoint: function(line1, line2, point) {
             var intersec = this.getIntersection(line1, line2);
             if (intersec === null || intersec === Infinity) {
                 return null;
@@ -226,8 +226,8 @@ var G = (function() {
                 b2 = bisectors.b2,
                 p = intersec.getShiftedByVector(b1.getDirectingVector()),
                 invertedP = intersec.getShiftedByVector(b1.getDirectingVector().getMulOnScalar(-1));
-            if (line1.arePointsOnSameSide(focus, p) && line2.arePointsOnSameSide(focus, p) ||
-                line1.arePointsOnSameSide(focus, invertedP) && line2.arePointsOnSameSide(focus, invertedP)) {
+            if (line1.arePointsOnSameSide(point, p) && line2.arePointsOnSameSide(point, p) ||
+                line1.arePointsOnSameSide(point, invertedP) && line2.arePointsOnSameSide(point, invertedP)) {
                 return b1;
             }
             else {
@@ -235,10 +235,10 @@ var G = (function() {
             }
         },
 
-        //Возвращает среднюю линию двух параллельных прямых
+        //Возвращает медиатрису двух параллельных прямых
         getMidLine: function(line1, line2) {
             if (line1.getIntersectionWithLine(line2) != null)
-                throw Error("Невозможно найти среднюю линию, прямые непараллельны");
+                throw Error("Невозможно найти медиатрису, прямые не параллельны");
             var d = line1.getPointOn().distToLine(line2) / 2,
                 normalizedNormalVector = line1.getNormalVector().getMulOnScalar(d / line1.getNormalVector().getModule());
             //Разворачиваем вектор нормали, чтобы он был направлен ко второй прямой

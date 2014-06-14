@@ -4,6 +4,9 @@
  * Time: 23:10
  */
 function Line(a, b, c) {
+    if (a === undefined) {
+        var ddt = "ha";
+    }
     //Представление ax + by + c = 0
     //По двум точкам
     if (c === undefined) {
@@ -82,18 +85,18 @@ function Line(a, b, c) {
         }
         else {
             var v = new Vector(beam.point, p);
-            return v.sameDirected(beam.vector) ? p : null;
+            return v.sameDirected(beam.vector) || v.isZero() ? p : null;
         }
     };
     //Может вернуть @Segment, @Point или null
     this.getIntersectionWithSegment = function(segment) {
-        if (segment.a.isOnLine(this) && segment.b.isOnLine(this)) {
+        if (this.isPointOn(segment.a) && this.isPointOn(segment.b)) {
             return segment;
         }
         else {
             var p = this.getIntersectionWithLine(segment.getLine());
             return p === null ? null
-                              : p.isOnSegment(segment) ? p
+                              : segment.isPointOn(p) ? p
                                                        : null;
         }
     }

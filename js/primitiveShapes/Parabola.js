@@ -63,12 +63,12 @@ function Parabola(focus, directrix) {
             if (res.rootAmount === 1)
                 return {
                     pointAmount: 1,
-                    p: [new Point(line.x, res.root)]
+                    p: [new Point(line.x, res.roots[0])]
                 };
             if (res.rootAmount === 2)
                 return {
                     pointAmount: 2,
-                    p: [new Point(line.x, res.root1), new Point(line.x, res.root2)]
+                    p: [new Point(line.x, res.roots[0]), new Point(line.x, res.roots[1])]
                 }
         }
         else {
@@ -85,12 +85,13 @@ function Parabola(focus, directrix) {
             if (res.rootAmount === 1)
                 return {
                     pointAmount: 1,
-                    p: [new Point(res.root, line.m * res.root + line.n)]
+                    p: [new Point(res.roots[0], line.m * res.roots[0] + line.n)]
                 };
             if (res.rootAmount === 2)
                 return {
                     pointAmount: 2,
-                    p: [new Point(res.root1, line.m * res.root1 + line.n), new Point(res.root2, line.m * res.root2 + line.n)]
+                    p: [new Point(res.roots[0], line.m * res.roots[0] + line.n),
+                        new Point(res.roots[1], line.m * res.roots[1] + line.n)]
                 }
         }
     };
@@ -101,7 +102,7 @@ function Parabola(focus, directrix) {
         }
         var p = [];
         for (var i = 0; i < intersec.p.length; i++) {
-            if (intersec.p[i].isOnBeam(beam)) {
+            if (beam.isPointOn(intersec.p[i])) {
                 p.push(intersec.p[i]);
             }
         }
@@ -116,7 +117,7 @@ function Parabola(focus, directrix) {
             return intersec;
         var p = [];
         for (var i = 0; i < intersec.p.length; i++) {
-            if (intersec.p[i].isOnSegment(segment)) {
+            if (segment.isPointOn(intersec.p[i])) {
                 p.push(intersec.p[i]);
             }
         }
@@ -145,7 +146,7 @@ function Parabola(focus, directrix) {
                     }
                 }
             }
-            var b = G.chooseBisectorInSameSectorAsFocus(d1, d2, this.focus);
+            var b = G.chooseBisectorInSameSectorAsPoint(d1, d2, this.focus);
             return this.getIntersectionWithLine(b);
         }
         //Общая директриса

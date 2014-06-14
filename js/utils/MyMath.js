@@ -10,7 +10,7 @@ var MyMath = {
                 throw new Error("Квадратное уравнение задано неверно: a = 0 и b = 0");
             return {
                 rootAmount: 1,
-                root: -c / b
+                roots: [-c / b]
             }
         }
         var d = b * b - 4 * a * c;
@@ -21,13 +21,12 @@ var MyMath = {
         if (Math.abs(d) < Config.quadraticEquationEps)
             return {
                 rootAmount: 1,
-                root: -b / (2 * a)
+                roots: [-b / (2 * a)]
             };
         if (d > 0)
             return {
                 rootAmount: 2,
-                root1: (-b + Math.sqrt(d)) / (2 * a),
-                root2: (-b - Math.sqrt(d)) / (2 * a)
+                roots: [(-b + Math.sqrt(d)) / (2 * a), (-b - Math.sqrt(d)) / (2 * a)]
             }
     }
 };

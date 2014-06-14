@@ -18,12 +18,15 @@ function Vector(a, b) {
     this.equalsToVector = function(v) {
         return this.x === v.x && this.y === v.y;
     };
+    this.isZero = function() {
+        return Math.abs(this.x) < Config.zeroPointEps && Math.abs(this.y) < Config.zeroPointEps;
+    };
     this.getModule = function() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     };
     this.getNormalized = function() {
         var m = this.getModule();
-        return new Vector(this.getMulOnScalar(1 / m));
+        return this.getMulOnScalar(1 / m);
     };
     this.getSum = function(v) {
         return new Vector(this.x + v.x, this.y + v.y);
@@ -44,7 +47,7 @@ function Vector(a, b) {
         var p = new Point(this.x, this.y).getRotated(phi);
         return new Vector(p.x, p.y);
     };
-    //От текущего до v, по часовой стрелке
+    //От текущего до v, против часовой стрелки (на холсте — по часовой!)
     this.getAlpha = function(v) {
         var alpha = this.getMinAlpha(v),
             vp = this.getVectorProduct(v);

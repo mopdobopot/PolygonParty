@@ -11,6 +11,10 @@ function Beam(point, vector) {
     this.getPointOn = function() {
         return this.point.getShiftedByVector(this.vector);
     };
+    this.isPointOn = function(point) {
+        var v = new Vector(this.point, point);
+        return this.line.isPointOn(point) && this.vector.getScalarProduct(v) > 0;
+    };
     this.equalsToBeam = function(beam) {
         return this.point.equalsToPoint(beam.point) &&
                this.vector.equalsToVector(beam.vector);
@@ -28,16 +32,16 @@ function Beam(point, vector) {
             return null;
         }
         else if (Type.isBeam(intersec)) {
-            if (this.point.isOnBeam(beam)) {
-                return beam.point.isOnBeam(this) ? new Segment(this.point, beam.point)
-                                                 : this;
+            if (beam.isPointOn(this.point)) {
+                return this.isPointOn(beam.point) ? new Segment(this.point, beam.point)
+                                                  : this;
             }
             else {
-                return beam.point.isOnBeam(this) ? beam : null;
+                return this.isPointOn(beam.point) ? beam : null;
             }
         }
         else if (Type.isPoint(intersec)) {
-            return intersec.isOnBeam(beam) ? intersec : null;
+            return beam.isPointOn(intersec) ? intersec : null;
         }
     };
 }
