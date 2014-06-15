@@ -4,7 +4,7 @@
  * Time: 14:31
  */
 var Config = {
-    debugDrawing: true,
+    debugDrawing: false,
 
     polygonFileName: "p",
 

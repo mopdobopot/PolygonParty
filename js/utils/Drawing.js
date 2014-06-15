@@ -89,7 +89,8 @@ var Drawing = (function() {
             drawAxis(context, width, height, Config.axisColor);
         },
         clearCanvas: function(context, width, height) {
-            context.clearRect(0, 0, width, height);
+            var c = context || this.c;
+            c.clearRect(0, 0, width, height);
             $('#infoTable').html("");
         },
         drawPolygon: function(vertexes, context, width, height, isVertexNumberNeeded) {
@@ -135,6 +136,8 @@ var Drawing = (function() {
         drawSegment: function(segment, color, context) {
             var c = context || this.c;
             c.strokeStyle = color;
+            this.drawPoint(segment.a, color, 1);
+            this.drawPoint(segment.b, color, 1);
             c.beginPath();
             c.moveTo(segment.a.x, segment.a.y);
             c.lineTo(segment.b.x, segment.b.y);

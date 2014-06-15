@@ -29,6 +29,7 @@ $(document).ready(function() {
         };
 
     $canvas.mousedown(function(e) {
+        if (currentPolygon === undefined) return;
         $canvas.css('cursor', 'default');
         var i = tryToFindVertex({x: e.offsetX, y: e.offsetY}, currentVertexes);
         if (i || i === 0) {
@@ -39,6 +40,7 @@ $(document).ready(function() {
         }
     });
     $canvas.mouseup(function() {
+        if (currentPolygon === undefined) return;
         for (var i = 0; i < currentVertexes.length; i++) {
             currentVertexes[i].isClicked = undefined;
         }
@@ -46,6 +48,7 @@ $(document).ready(function() {
         redraw();
     });
     $canvas.mousemove(function(e) {
+        if (currentPolygon === undefined) return;
         if (clickedVertex) {
             clickedVertex.x = e.offsetX;
             clickedVertex.y = e.offsetY;
@@ -266,6 +269,7 @@ $(document).ready(function() {
         checkbox_showVertexNumbers = $('input[name = withNumbers]');
 
     checkbox_showVertexNumbers.click(function() {
+        if (currentPolygon === undefined) return;
         redraw();
     });
 

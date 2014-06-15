@@ -170,8 +170,8 @@ var BasePolygon = (function() {
                 return G.getIntersection(sideCutFromLine(side1, midLine), sideCutFromLine(side2, midLine));
             }
             var bisectors = G.getBisectors(side1.getLine(), side2.getLine());
-            Drawing.drawLine(bisectors.b1, "#f33");
-            Drawing.drawLine(bisectors.b2, "#f33");
+            if (debug) Drawing.drawLine(bisectors.b1, "#f33");
+            if (debug) Drawing.drawLine(bisectors.b2, "#f33");
             //TODO Будет точно верно, если доказать единственность piece для 2 сторон
             return G.getIntersection(sideCutFromLine(side1, bisectors.b1), sideCutFromLine(side2, bisectors.b1)) ||
                    G.getIntersection(sideCutFromLine(side1, bisectors.b2), sideCutFromLine(side2, bisectors.b2));
@@ -188,7 +188,7 @@ var BasePolygon = (function() {
                 var intersec = G.getIntersection(currentPiece, effectCenterPerp);
                 //intersec это @Point или null
                 var pointOnCurrentPiece = currentPiece.getPointOn();
-                if (intersec === null || intersec.pointAmount === 0) {
+                if (intersec === null) {
                     //Если currentPiece целиком лежит ближе к effectPeak чем к peak, то currentPiece — пуст,
                     //иначе, effectPeak не оказывает влияния на currentPiece
                     return effectCenterPerp.arePointsOnSameSide(effectPeak.vertex, pointOnCurrentPiece) ? null
@@ -196,11 +196,11 @@ var BasePolygon = (function() {
                 }
                 else {
                     //Выбираем направление на которое не влияет effectPeak
-                    var v = new Vector(intersec.p[0], pointOnCurrentPiece);
+                    var v = new Vector(intersec, pointOnCurrentPiece);
                     if (effectCenterPerp.arePointsOnSameSide(effectPeak.vertex, pointOnCurrentPiece)) {
                         v = v.getMulOnScalar(-1);
                     }
-                    var beam = new Beam(intersec.p[0], v);
+                    var beam = new Beam(intersec, v);
                     return G.getIntersection(currentPiece, beam);
                 }
             }
