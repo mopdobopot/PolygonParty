@@ -128,7 +128,7 @@ $(document).ready(function() {
             case convexPolygonName:
                 enable(div_regular);
                 disable(div_nonConvexityDegreeBlock);
-                if (input_vertexAmount.val() == 4 && !isChecked(checkbox_regular)) {
+                if (input_vertexAmount.val() == 4 && !isChecked(checkbox_regular)) {  //именно ==, вдруг там строка
                     enable(div_rectangleTypes);
                 }
                 break;
@@ -166,7 +166,7 @@ $(document).ready(function() {
         if (isChecked(checkbox_regular)) {
             disable(div_rectangleTypes);
         }
-        else if (input_vertexAmount.val() == 4) {
+        else if (input_vertexAmount.val() == 4) {  //именно ==, вдруг там строка
             enable(div_rectangleTypes);
         }
     });
@@ -514,6 +514,21 @@ $(document).ready(function() {
                     saveAs(blob, pngName + ".png");
                 });
             }
-        }
+        };
+
+    //Без var, объявляется глобально!
+    exampleParallelSides1 = function() {
+        Example.parallelSides1();
+        currentVertexes = Example.vertexes;
+        currentPolygon = Example;
+        createInfoTable(currentPolygon);
+    };
+    //Без var, объявляется глобально!
+    exampleParallelSides2 = function() {
+        Example.parallelSides2();
+        currentVertexes = Example.vertexes;
+        currentPolygon = Example;
+        createInfoTable(currentPolygon);
+    }
 });
 

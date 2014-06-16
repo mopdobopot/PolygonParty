@@ -74,15 +74,15 @@ function Segment(p1, p2) {
             swapIfNeed = function(seg) {
                 var t;
                 if (seg.b.x < seg.a.x) {
-                    t = seg.a.x;
-                    seg.a.x = seg.b.x;
-                    seg.b.x = t;
+                    t = seg.a;
+                    seg.a = seg.b;
+                    seg.b = t;
                 }
                 else if (seg.b.x === seg.a.x) {
                     if (seg.b.y < seg.a.y) {
-                        t = seg.a.y;
-                        seg.a.y = seg.b.y;
-                        seg.b.y = t;
+                        t = seg.a;
+                        seg.a = seg.b;
+                        seg.b = t;
                     }
                 }
             },
@@ -101,6 +101,9 @@ function Segment(p1, p2) {
                 a = this.a.distToPoint(this.b);
                 b = this.a.distToPoint(segment.a);
                 c = this.a.distToPoint(segment.b);
+                if (Math.abs(b - a) < Config.eps) {
+                    return this.b;
+                }
                 return b > a ? null
                              : c > a ? new Segment(segment.a, this.b)
                                      : segment;
@@ -109,6 +112,9 @@ function Segment(p1, p2) {
                 a = segment.a.distToPoint(segment.b);
                 b = segment.a.distToPoint(this.a);
                 c = segment.a.distToPoint(this.b);
+                if (Math.abs(b - a) < Config.eps) {
+                    return segment.b;
+                }
                 return b > a ? null
                              : c > a ? new Segment(this.a, segment.b)
                                      : this;

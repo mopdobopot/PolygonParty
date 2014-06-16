@@ -9,6 +9,7 @@ function Point(x, y) {
     this.y = y;
 
     this.equalsToPoint = function(p) {
+        if (!Type.isPoint(p)) return false;
         return (Math.abs(this.x - p.x) < Config.eps) && (Math.abs(this.y - p.y) < Config.eps);
     };
     this.distToPoint = function(p) {

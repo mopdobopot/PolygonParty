@@ -76,10 +76,19 @@ var BasePolygon = (function() {
         peakCutFromParabolicSegment = function(peak, pSeg) {
             var intersec1 = G.getIntersection(pSeg.parabola, peak.beam1),
                 intersec2 = G.getIntersection(pSeg.parabola, peak.beam2);
-            //peak это фокус параболы => intersec1 и intersec2 содержат ровно по одной точке
-            var pBeam1 = chooseParabolicBeam(pSeg.parabola, intersec1.p[0], peak);
-            var pBeam2 = chooseParabolicBeam(pSeg.parabola, intersec2.p[0], peak);
-            var beamIntersec = G.getIntersection(pBeam1, pBeam2);
+            //peak это фокус параболы => intersec1 и intersec2 содержат ровно по одной точке,
+            //либо один из них содержит 0 точек
+            if (intersec1.pointAmount === 0) {
+                var beamIntersec = chooseParabolicBeam(pSeg.parabola, intersec2.p[0], peak);
+            }
+            else if (intersec2.pointAmount === 0) {
+                beamIntersec = chooseParabolicBeam(pSeg.parabola, intersec1.p[0], peak);
+            }
+            else {
+                var pBeam1 = chooseParabolicBeam(pSeg.parabola, intersec1.p[0], peak);
+                var pBeam2 = chooseParabolicBeam(pSeg.parabola, intersec2.p[0], peak);
+                beamIntersec = G.getIntersection(pBeam1, pBeam2);
+            }
             if (beamIntersec != null) {
                 return G.getIntersection(beamIntersec, pSeg);
             }
@@ -106,22 +115,22 @@ var BasePolygon = (function() {
             var x = G.getIntersection(side, line);
             var intersec1 = G.getIntersection(line, side.beamA);
             var intersec2 = G.getIntersection(line, side.beamB);
-            if (Type.isSegment(x)) {
-                return side;
+            if (intersec1 != null && intersec2 != null) {
+                return new Segment(intersec1, intersec2);
             }
+            //Отрезок перпендикулярен прямой и не пересекает её
             if (x === null) {
-                //Если сторона перпендикулярна прямой и не пересекает её — вернём null
-                return intersec1 === null ? null : new Segment(intersec1, intersec2);
+                return null;
             }
             //Берём непустое пересечение, если оно есть
-            intersec1 = intersec1 || intersec2;
-            if (Type.isBeam(intersec1) || Type.isPoint(intersec1)) {
-                return intersec1;
-            }
-            if (intersec1 === null) {
+            var intersec = intersec1 || intersec2;
+            if (intersec === null) {
                 return new Beam(x, side.beamA.getDirectingVector());
             }
-            return new Segment(x, intersec1);
+            if (Type.isBeam(intersec) || intersec.equalsToPoint(x)) {
+                return intersec;
+            }
+            return new Segment(x, intersec);
         },
         // ---------------------------------------------------------------------------------------------   GET PIECE
         //Возвращает @ParabolicSegment или null
@@ -172,9 +181,19 @@ var BasePolygon = (function() {
             var bisectors = G.getBisectors(side1.getLine(), side2.getLine());
             if (debug) Drawing.drawLine(bisectors.b1, "#f33");
             if (debug) Drawing.drawLine(bisectors.b2, "#f33");
-            //TODO Будет точно верно, если доказать единственность piece для 2 сторон
-            return G.getIntersection(sideCutFromLine(side1, bisectors.b1), sideCutFromLine(side2, bisectors.b1)) ||
-                   G.getIntersection(sideCutFromLine(side1, bisectors.b2), sideCutFromLine(side2, bisectors.b2));
+            //Выбираем биссектрису
+            var n1 = side1.beamA.getDirectingVector();
+            var n2 = side2.beamA.getDirectingVector();
+            var v = bisectors.b1.getDirectingVector();
+            var b = v.getVectorProduct(n1) * v.getVectorProduct(n2) < 0 ? bisectors.b1
+                                                                        : bisectors.b2;
+
+            var cut1 = sideCutFromLine(side1, b);
+            var cut2 = sideCutFromLine(side2, b);
+            if (Type.isPoint(cut1) || Type.isPoint(cut2)) {
+                return null;
+            }
+            return G.getIntersection(cut1, cut2);
         },
         //----------------------------------------------------------------------------------------------    EFFECT
         //Влияние пика на пару пиков (currentPiece — луч или отрезок)
@@ -271,10 +290,10 @@ var BasePolygon = (function() {
                 }
                 else {
                     var v = currentPiece.getDirectingVector();
-                    if (b.arePointsOnSameSide(intersec.p[0].getShiftedByVector(v), effectSide.getPointOn())) {
+                    if (b.arePointsOnSameSide(intersec.getShiftedByVector(v), effectSide.getPointOn())) {
                         v = v.getMulOnScalar(-1);
                     }
-                    return G.getIntersection(currentPiece, new Beam(intersec.p[0], v));
+                    return G.getIntersection(currentPiece, new Beam(intersec, v));
                 }
             }
             return currentPiece;
@@ -640,7 +659,8 @@ var BasePolygon = (function() {
                             }
                         }
                         if (currentPiece != null) {
-                            currentAlpha = Math.PI - sidesAlpha;
+                            var minAlpha = side1.getDirectingVector().getMinAlpha(side2.getDirectingVector());
+                            currentAlpha = Math.abs(minAlpha - Math.PI) < Config.eps ? Math.PI : Math.PI - minAlpha;
                         }
                     }
                     if (currentAlpha > maxAlpha) {
