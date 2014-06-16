@@ -182,14 +182,13 @@ var BasePolygon = (function() {
                 return null;
             }
             var bisectors = G.getBisectors(side1.getLine(), side2.getLine());
-            if (debug) Drawing.drawLine(bisectors.b1, "#f33");
-            if (debug) Drawing.drawLine(bisectors.b2, "#f33");
             //Выбираем биссектрису
             var n1 = side1.beamA.getDirectingVector();
             var n2 = side2.beamA.getDirectingVector();
             var v = bisectors.b1.getDirectingVector();
             var b = v.getVectorProduct(n1) * v.getVectorProduct(n2) < 0 ? bisectors.b1
                                                                         : bisectors.b2;
+            if (debug) Drawing.draw(b, "#aaf");
             var cut1 = sideCutFromLine(side1, b);
             var cut2 = sideCutFromLine(side2, b);
             if (Type.isPoint(cut1) || Type.isPoint(cut2)) {
@@ -360,8 +359,8 @@ var BasePolygon = (function() {
                     var v = decreaseShiftingVector(currentPiece.parabola, intersec.p[0], currentPiece.vectorA);
                     var p = intersec.p[0].getShiftedByVector(v);
                     var c = currentPiece;
-                    var seg1 = new ParabolicSegment(c.parabola, c.b, c.vectorB, p, v);
-                    var seg2 = new ParabolicSegment(c.parabola, c.a, c.vectorA, p, v.getMulOnScalar(-1));
+                    var seg1 = new ParabolicSegment(c.parabola, c.b, c.vectorB, intersec.p[0], v);
+                    var seg2 = new ParabolicSegment(c.parabola, c.a, c.vectorA, intersec.p[0], v.getMulOnScalar(-1));
                     if (G.getIntersection(new Segment(p, peak.vertex), effectParabola) === null) {
                         return peakIsEffect ? seg2 : seg1;
                     }
@@ -390,8 +389,8 @@ var BasePolygon = (function() {
                 var b = effectPiece.getLine();
                 var intersec = G.getIntersection(currentPiece, b);
                 if (intersec === null || intersec.pointAmount === 0) {
-                    return b.arePointsOnSameSide(currentPiece.getPointOn(), side.getPointOn()) ? null
-                                                                                               : currentPiece;
+                    return b.arePointsOnSameSide(currentPiece.getPointOn(), effectSide.getPointOn()) ? null
+                                                                                                     : currentPiece;
                 }
                 else if (intersec.pointAmount === 1) {
                     //Чуть смещаем точку пересечения и смотрим, с какой она стороны от биссектрисы

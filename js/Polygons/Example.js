@@ -56,6 +56,37 @@ var Example = {
         this.addVertex(new Point(0, 250));
         this.centerAndDraw(720, 500, Drawing.c, true);
         return this.vertexes;
+    },
+    simple: function() {
+        this.dropVertexes();
+        this.addVertex(new Point(0, 0));
+        this.addVertex(new Point(100, 200));
+        this.addVertex(new Point(200, 0));
+        this.addVertex(new Point(200, 300));
+        this.addVertex(new Point(0, 300));
+        this.centerAndDraw(720, 500, Drawing.c, true);
+        return this.vertexes;
+    },
+    anotherSimple: function() {
+        this.dropVertexes();
+        this.addVertex(new Point(0, 0));
+        this.addVertex(new Point(50, 100));
+        this.addVertex(new Point(300, 50));
+        this.addVertex(new Point(300, 150));
+        this.addVertex(new Point(0, 150));
+        this.centerAndDraw(720, 500, Drawing.c, true);
+        return this.vertexes;
+    },
+    bisectors: function() {
+        this.dropVertexes();
+        this.addVertex(new Point(0, 0));
+        this.addVertex(new Point(350, 0));
+        this.addVertex(new Point(350, 300));
+        this.addVertex(new Point(300, 50));
+        this.addVertex(new Point(50, 100));
+        this.addVertex(new Point(0, 300));
+        this.centerAndDraw(720, 500, Drawing.c, true);
+        return this.vertexes;
     }
 };
 Example.__proto__ = BasePolygon;

@@ -542,5 +542,23 @@ $(document).ready(function() {
         currentPolygon = Example;
         createInfoTable(currentPolygon);
     };
+    ex3 = function() {
+        Example.simple();
+        currentVertexes = Example.vertexes;
+        currentPolygon = Example;
+        createInfoTable(currentPolygon);
+    };
+    ex4 = function() {
+        Example.anotherSimple();
+        currentVertexes = Example.vertexes;
+        currentPolygon = Example;
+        createInfoTable(currentPolygon);
+    };
+    ex5 = function() {
+        Example.bisectors();
+        currentVertexes = Example.vertexes;
+        currentPolygon = Example;
+        createInfoTable(currentPolygon);
+    }
 });
 
