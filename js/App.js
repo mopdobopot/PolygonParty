@@ -529,6 +529,18 @@ $(document).ready(function() {
         currentVertexes = Example.vertexes;
         currentPolygon = Example;
         createInfoTable(currentPolygon);
-    }
+    };
+    ex1 = function() {
+        Example.square();
+        currentVertexes = Example.vertexes;
+        currentPolygon = Example;
+        createInfoTable(currentPolygon);
+    };
+    ex2 = function() {
+        Example.parabolic();
+        currentVertexes = Example.vertexes;
+        currentPolygon = Example;
+        createInfoTable(currentPolygon);
+    };
 });
 

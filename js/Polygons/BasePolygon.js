@@ -42,18 +42,18 @@ var BasePolygon = (function() {
         chooseParabolicBeam = function(parabola, intersection, peak) {
             var v = decreaseShiftingVector(parabola, intersection, parabola.directrix.getDirectingVector());
             var p1 = intersection.getShiftedByVector(v);
-            var p2 = intersection.getShiftedByVector(parabola.directrixNormalVector).getShiftedByVector(v);
+            var p2 = intersection.getShiftedByVector(new Vector(parabola.vertex, parabola.focus)).getShiftedByVector(v);
             var l = new Line(p1, p2);
             var T = G.getIntersection(l, parabola);
-            var vT = new Vector(peak.vertex, T);
+            var vT = new Vector(peak.vertex, T.p[0]);
             var b1v = peak.beam1.vector;
             var b2v = peak.beam2.vector;
             if (b1v.getVectorProduct(vT) * b1v.getVectorProduct(b2v) > 0 &&
                 b2v.getVectorProduct(vT) * b2v.getVectorProduct(b1v) > 0) {
-                return v;
+                return new ParabolicBeam(parabola, intersection, v);
             }
             else {
-                return v.getMulOnScalar(-1);
+                return new ParabolicBeam(parabola, intersection, v.getMulOnScalar(-1));
             }
         },
         // -------------------------------------------------------------------------------------------------    CUTS
@@ -178,6 +178,9 @@ var BasePolygon = (function() {
                 var midLine = G.getMidLine(l1, l2);
                 return G.getIntersection(sideCutFromLine(side1, midLine), sideCutFromLine(side2, midLine));
             }
+            if (x === Infinity) {
+                return null;
+            }
             var bisectors = G.getBisectors(side1.getLine(), side2.getLine());
             if (debug) Drawing.drawLine(bisectors.b1, "#f33");
             if (debug) Drawing.drawLine(bisectors.b2, "#f33");
@@ -187,7 +190,6 @@ var BasePolygon = (function() {
             var v = bisectors.b1.getDirectingVector();
             var b = v.getVectorProduct(n1) * v.getVectorProduct(n2) < 0 ? bisectors.b1
                                                                         : bisectors.b2;
-
             var cut1 = sideCutFromLine(side1, b);
             var cut2 = sideCutFromLine(side2, b);
             if (Type.isPoint(cut1) || Type.isPoint(cut2)) {
@@ -196,7 +198,7 @@ var BasePolygon = (function() {
             return G.getIntersection(cut1, cut2);
         },
         //----------------------------------------------------------------------------------------------    EFFECT
-        //Влияние пика на пару пиков (currentPiece — луч или отрезок)
+        //Влияние пика пик на пары пиков (currentPiece — луч или отрезок)
         peakPeakOnLinearEffect = function(peak, effectPeak, currentPiece) {
             if (currentPiece === null) {
                 return null;
@@ -225,7 +227,7 @@ var BasePolygon = (function() {
             }
             return currentPiece;
         },
-        //Влияние стороны на пару пиков (currentPiece — луч или отрезок)
+        //Влияние стороны на пик пары пиков (currentPiece — луч или отрезок)
         //параметр peakIsEffect — фича для метода peakSideOnLinearEffect()
         sidePeakOnLinearEffect = function(peak, side, currentPiece, peakIsEffect) {
             if (currentPiece === null) {
@@ -270,19 +272,24 @@ var BasePolygon = (function() {
             }
             return currentPiece;
         },
-        //Влияние стороны на пару сторон (currentPiece — отрезок)
+        //Влияние стороны на сторону пары сторон (currentPiece — отрезок)
         sideSideOnLinearEffect = function(side, effectSide, currentPiece) {
-            if (currentPiece === null) {
+            //Забъём на точки, короче
+            if (currentPiece === null || Type.isPoint(currentPiece)) {
                 return null;
             }
-            //Предполагаю что effectPiece отрезок
             var effectPiece = getPieceForSideSide(side, effectSide);
-            if (effectPiece != null) {
+            //Если получается точка, будем считать что она не оказывает влияния
+            if (Type.isSegment(effectPiece)) {
                 var b = effectPiece.getLine();
                 var intersec = G.getIntersection(currentPiece, b);
                 if (intersec === Infinity) {
                     return currentPiece;
                 }
+                //ЖЕСТОКОЕ ДОПУЩЕНИЕ!!!---------------------------------------
+                if (Type.isSegment(intersec)) {
+                    intersec = intersec.a;
+                }//-----------------------------------------------------------
                 //intersec это @Point или null
                 if (intersec === null) {
                     return b.arePointsOnSameSide(currentPiece.getPointOn(), effectSide.getPointOn()) ? null
@@ -298,11 +305,11 @@ var BasePolygon = (function() {
             }
             return currentPiece;
         },
-        //Влияние пика на пару сторон (currentPiece — отрезок)
+        //Влияние пика на сторону пары сторон (currentPiece — отрезок)
         peakSideOnLinearEffect = function(side, effectPeak, currentPiece) {
             return sidePeakOnLinearEffect(effectPeak, side, currentPiece, true);
         },
-        //Влияние пика на пару пик-сторона (currentPiece — @parabolicSegment)
+        //Влияние пика на пик пары пик-сторона (currentPiece — @parabolicSegment)
         peakPeakOnParabolicEffect = function(peak, effectPeak, currentPiece) {
             if (currentPiece === null) {
                 return null;
@@ -319,13 +326,10 @@ var BasePolygon = (function() {
                     //Чуть смещаем точку пересечения и смотрим — она с той же стороны что peak или нет
                     var v = decreaseShiftingVector(currentPiece.parabola, intersec.p[0], currentPiece.vectorA);
                     var p = intersec.p[0].getShiftedByVector(v);
-                    var c = currentPiece;
-                    if (effectCenterPerp.arePointsOnSameSide(p, peak.vertex)) {
-                        return new ParabolicSegment(c.parabola, c.b, c.vectorB, p, v);
+                    if (!effectCenterPerp.arePointsOnSameSide(p, peak.vertex)) {
+                        v.getMulOnScalar(-1);
                     }
-                    else {
-                        return new ParabolicSegment(c.parabola, c.a, c.vectorA, p, v.getMulOnScalar(-1));
-                    }
+                    return G.getIntersection(currentPiece, new ParabolicBeam(currentPiece.parabola, intersec.p[0], v));
                 }
                 else {
                     console.log("Серединный перпендикуляр пересекает currentPiece-parabolicSegment в двух точках");
@@ -333,7 +337,7 @@ var BasePolygon = (function() {
             }
             return currentPiece;
         },
-        //Влияние стороны на пару пик-сторона (currentPiece — @parabolicSegment)
+        //Влияние стороны на пик пары пик-сторона (currentPiece — @parabolicSegment)
         sidePeakOnParabolicEffect = function(peak, effectSide, currentPiece, peakIsEffect) {
             if (currentPiece === null) {
                 return null;
@@ -354,7 +358,7 @@ var BasePolygon = (function() {
                 else if (intersec.pointAmount === 1) {
                     //Чуть смещаем точку пересечения и смотрим — внутри она effectParabola или нет
                     var v = decreaseShiftingVector(currentPiece.parabola, intersec.p[0], currentPiece.vectorA);
-                    var p = intersec.getShiftedByVector(v);
+                    var p = intersec.p[0].getShiftedByVector(v);
                     var c = currentPiece;
                     var seg1 = new ParabolicSegment(c.parabola, c.b, c.vectorB, p, v);
                     var seg2 = new ParabolicSegment(c.parabola, c.a, c.vectorA, p, v.getMulOnScalar(-1));
@@ -371,11 +375,11 @@ var BasePolygon = (function() {
             }
             return currentPiece;
         },
-        //Влияние пика на пару пик-сторона (currentPiece — @parabolicSegment)
+        //Влияние пика на сторону пары пик-сторона (currentPiece — @parabolicSegment)
         peakSideOnParabolicEffect = function(side, effectPeak, currentPiece) {
             return sidePeakOnParabolicEffect(effectPeak, side, currentPiece, true);
         },
-        //Влияние стороны на пару пик-сторона (currentPiece — @parabolicSegment)
+        //Влияние стороны на сторону пары пик-сторона (currentPiece — @parabolicSegment)
         sideSideOnParabolicEffect = function(side, effectSide, currentPiece) {
             if (currentPiece === null) {
                 return null;
@@ -390,16 +394,13 @@ var BasePolygon = (function() {
                                                                                                : currentPiece;
                 }
                 else if (intersec.pointAmount === 1) {
-                    //Чуть смещаем точку пересечения и смотрим — она внутри параболы или нет
+                    //Чуть смещаем точку пересечения и смотрим, с какой она стороны от биссектрисы
                     var v = decreaseShiftingVector(currentPiece.parabola, intersec.p[0], currentPiece.vectorA);
                     var p = intersec.p[0].getShiftedByVector(v);
-                    var c = currentPiece;
-                    if (b.arePointsOnSameSide(p, currentPiece.parabola.focus)) {
-                        return new ParabolicSegment(c.parabola, c.b, c.vectorB, p, v);
+                    if (!b.arePointsOnSameSide(p, currentPiece.parabola.directrix.getPointOn())) {
+                        v = v.getMulOnScalar(-1);
                     }
-                    else {
-                        return new ParabolicSegment(c.parabola, c.a, c.vectorA, p, v.getMulOnScalar(-1));
-                    }
+                    return G.getIntersection(currentPiece, new ParabolicBeam(currentPiece.parabola, intersec.p[0], v));
                 }
                 else if (intersec.pointAmount === 2) {
                     console.log("Биссектриса пересекает currentPiece-parabolicSegment в двух точках");
@@ -587,12 +588,12 @@ var BasePolygon = (function() {
                                 if (k != i) {
                                     effectPeak = this.peaks[k];
                                     //На пик
-                                    if (!peak.isNeighbour(effectPeak)) {
+                                    if (!peak.isNeighbour(effectPeak) && !side.isPointOn(effectPeak.vertex)) {
                                         currentPiece = peakPeakOnParabolicEffect(peak, effectPeak, currentPiece);
                                     }
                                     //На сторону
                                     if (!side.isPointOn(effectPeak.vertex)) {
-                                        currentPiece = peakSideOnParabolicEffect(effectPeak, side, currentPiece);
+                                        currentPiece = peakSideOnParabolicEffect(side, effectPeak, currentPiece);
                                     }
                                 }
                                 if (currentPiece === null) break;
@@ -603,7 +604,7 @@ var BasePolygon = (function() {
                                 if (k != j) {
                                     effectSide = this.sides[k];
                                     //На пик
-                                    if (!effectSide.isPointOn(peak)) {
+                                    if (!effectSide.isPointOn(peak.vertex)) {
                                         currentPiece = sidePeakOnParabolicEffect(peak, effectSide, currentPiece);
                                     }
                                     //На сторону (соседние стороны тоже оказывают влияние)
@@ -629,43 +630,36 @@ var BasePolygon = (function() {
                     var side2 = this.sides[j];
                     var sidesAlpha = side1.getDirectingVector().getAlpha(side2.getDirectingVector());
                     currentAlpha = 0;
-                    //Для соседних "вмятых" сторон сразу считаем альфа-выпуклость
-                    if (j === i + 1 && sidesAlpha >= Math.PI) {
-                        currentAlpha = Math.PI - sidesAlpha;
-                    }
-                    else {
-                        currentPiece = getPieceForSideSide(side1, side2);
-                        if (currentPiece != null) {
-                            //Влияние пиков
-                            for (k = 0; k < lp; k++) {
-                                effectPeak = this.peaks[k];
-                                //Рассматриваем все пики, кроме соседних
-                                if (!side1.isPointOn(effectPeak.vertex) && !side2.isPointOn(effectPeak.vertex)) {
-                                    currentPiece = peakSideOnLinearEffect(side1, effectPeak, currentPiece);
-                                    currentPiece = peakSideOnLinearEffect(side2, effectPeak, currentPiece);
-                                }
-                                if (currentPiece === null) break;
+                    currentPiece = getPieceForSideSide(side1, side2);
+                    if (currentPiece != null) {
+                        //Влияние пиков
+                        for (k = 0; k < lp; k++) {
+                            effectPeak = this.peaks[k];
+                            //Рассматриваем все пики, кроме соседних
+                            if (!side1.isPointOn(effectPeak.vertex) && !side2.isPointOn(effectPeak.vertex)) {
+                                currentPiece = peakSideOnLinearEffect(side1, effectPeak, currentPiece);
+                                currentPiece = peakSideOnLinearEffect(side2, effectPeak, currentPiece);
                             }
-                            if (currentPiece === null) continue;
-                            //Влияние сторон
-                            for (k = 0; k < ls; k++) {
-                                if (k != i && k != j) {
-                                    //Учитываем любые стороны, в том числе, смежные
-                                    effectSide = this.sides[k];
-                                    currentPiece = sideSideOnLinearEffect(side1, effectSide, currentPiece);
-                                    currentPiece = sideSideOnLinearEffect(side2, effectSide, currentPiece);
-                                }
-                                if (currentPiece === null) break;
-                            }
+                            if (currentPiece === null) break;
                         }
-                        if (currentPiece != null) {
-                            var minAlpha = side1.getDirectingVector().getMinAlpha(side2.getDirectingVector());
-                            currentAlpha = Math.abs(minAlpha - Math.PI) < Config.eps ? Math.PI : Math.PI - minAlpha;
+                        if (currentPiece === null) continue;
+                        //Влияние сторон
+                        for (k = 0; k < ls; k++) {
+                            if (k != i && k != j) {
+                                //Учитываем любые стороны, в том числе, смежные
+                                effectSide = this.sides[k];
+                                currentPiece = sideSideOnLinearEffect(side1, effectSide, currentPiece);
+                                currentPiece = sideSideOnLinearEffect(side2, effectSide, currentPiece);
+                            }
+                            if (currentPiece === null) break;
                         }
                     }
-                    if (currentAlpha > maxAlpha) {
-                        maxAlpha = currentAlpha;
-                        //TODO drawing
+                    if (currentPiece != null) {
+                        currentAlpha = side1.beamA.getDirectingVector().getMinAlpha(side2.beamA.getDirectingVector());
+                        if (currentAlpha > maxAlpha) {
+                            maxAlpha = currentAlpha;
+                            //TODO drawing
+                        }
                     }
                 }
             }
