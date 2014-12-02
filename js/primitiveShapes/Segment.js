@@ -21,6 +21,9 @@ function Segment(p1, p2) {
     this.getPointOn = function() {
         return this.a;
     };
+    this.getLength = function() {
+        return this.getDirectingVector().getModule();
+    };
     this.isPointOn = function(point) {
         if (point.equalsToPoint(this.a) || point.equalsToPoint(this.b)) {
             return true;

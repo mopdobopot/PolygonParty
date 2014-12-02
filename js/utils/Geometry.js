@@ -103,6 +103,7 @@ var G = (function() {
             for (var i = 0; i < l - 1; i++) {
                 minDist = Math.min(minDist, this.distToSegment(p, vertexes[i], vertexes[i + 1]));
             }
+            return minDist;
         },
 
         //Возвращает true <=> l1 и l2 имеют ровно одну точку пересечения
@@ -130,24 +131,19 @@ var G = (function() {
                    !Point.arePointsEquals(p, intervalB);
         },
 
-        //Лучём считаем правую часть прямой line относительно точки point,
-        //пересечение луча и верхнего конца отрезка игнорируем
-        isBeamIntersectsSegment: function(line, p, segA, segB) {
-            var intersection = this.getLinesIntersection(line, this.makeLine(segA, segB));
-            if ((segA.y > segB.y && Point.arePointsEquals(intersection, segA)) ||
-                (segB.y > segA.y && Point.arePointsEquals(intersection, segB))) {
-                return false;
-            }
-            return this.isPointOnSegment(intersection, segA, segB) && (intersection.x >= p.x);
+        //Пересечение луча и верхнего конца отрезка игнорируем
+        isBeamIntersectsSegment: function(beam, p, segA, segB) {
+            var intersection = this.getIntersection(beam, new Line(segA, segB));
+            return intersection != null;
         },
 
         isLineIntersectsInterval: function(line, intervalA, intervalB) {
-            var intersection = this.getLinesIntersection(line, this.makeLine(intervalA, intervalB));
+            var intersection = this.getIntersection(line, new Line(intervalA, intervalB));
             return this.isPointOnInterval(intersection, intervalA, intervalB);
         },
 
         isSegmentIntersectsInterval: function(segA, segB, intervalA, intervalB) {
-            var intersection = this.getLinesIntersection(this.makeLine(segA, segB), this.makeLine(intervalA, intervalB));
+            var intersection = this.getIntersection(new Line(segA, segB), new Line(intervalA, intervalB));
             return this.isPointOnInterval(intersection, segA, segB) &&
                    this.isPointOnInterval(intersection, intervalA, intervalB);
         },
@@ -173,21 +169,14 @@ var G = (function() {
         },
 
         isPointInPolygon: function(p, vertexes) {
-            var beamLine = {a: 0, b: 1, c: -p.y},
-                intersections = 0,
-                length = vertexes.length;
-            for (var i = 0; i < length - 1; i++) {
-                if (this.isPointOnSegment(p, vertexes[i], vertexes[i+1])) {
-                    return true;
-                }
-                if (this.isBeamIntersectsSegment(beamLine, p, vertexes[i], vertexes[i + 1])) {
-                    intersections++;
-                }
+            var sumAlpha = 0;
+            for (var i = 0; i < vertexes.length - 1; i++) {
+                var a = new Vector(p, vertexes[i]).getAlpha(new Vector(p, vertexes[i + 1]));
+                sumAlpha += (a > Math.PI) ? a - 2 * Math.PI : a;
             }
-            if (this.isBeamIntersectsSegment(beamLine, p, vertexes[length - 1], vertexes[0])) {
-                intersections++;
-            }
-            return intersections % 2;
+            a = new Vector(p, vertexes[vertexes.length - 1]).getAlpha(new Vector(p, vertexes[0]));
+            sumAlpha += (a > Math.PI) ? a - 2 * Math.PI : a;
+            return Math.abs(sumAlpha - Math.PI * 2) < 0.01;
         },
 
         rotateVector: function(v, alpha) {
@@ -265,10 +254,25 @@ var G = (function() {
             return this.getNormalToLineContainsSegment(c, p1, p2);
         },
 
+        isPointAtDistanceToPolygon: function(p, dist, vertexes) {     //todo перенести в Geometry
+            return !this.isPointInPolygon(p, vertexes) && Math.abs(this.distToPolygon(p, vertexes) - dist) <= Config.eps;
+        },
+
         getIntersection: function(a, b) {
             if (a === null || b === null)
                 return null;
-            if (Type.isLine(a)) {
+            if (Type.isPoint(a)) {
+                if (Type.isPoint(b)) {
+                    return a.equalsToPoint(b) ? a : null;
+                }
+                else {
+                    return b.isPointOn(a);
+                }
+            }
+            else if (Type.isPoint(b)) {
+                return a.isPointOn(b);
+            }
+            else if (Type.isLine(a)) {
                 if (Type.isLine(b)) {
                     return a.getIntersectionWithLine(b);
                 }

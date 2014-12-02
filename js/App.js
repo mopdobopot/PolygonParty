@@ -268,6 +268,7 @@ $(document).ready(function() {
     var div_showVertexNumbers = $('div#vertexNumbersOption'),
         checkbox_showVertexNumbers = $('input[name = withNumbers]');
 
+    checkbox_showVertexNumbers.click();
     checkbox_showVertexNumbers.click(function() {
         if (currentPolygon === undefined) return;
         redraw();
@@ -516,49 +517,50 @@ $(document).ready(function() {
             }
         };
 
-    //Без var, объявляется глобально!
+    example = function(polygonExample) {
+        currentVertexes = Example.build(polygonExample);
+        currentPolygon = Example;
+        createInfoTable(currentPolygon);
+    };
+
+    exampleBisector = function() {
+        example(Example.bisector);
+    };
+    exampleTwoVertexes = function() {
+        example(Example.twoVertexes);
+    };
     exampleParallelSides1 = function() {
-        Example.parallelSides1();
-        currentVertexes = Example.vertexes;
-        currentPolygon = Example;
-        createInfoTable(currentPolygon);
+        example(Example.parallelSides1);
     };
-    //Без var, объявляется глобально!
     exampleParallelSides2 = function() {
-        Example.parallelSides2();
+        example(Example.parallelSides2);
+    };
+    exampleNonNeighbourSides = function() {
+        example(Example.nonNeighbourSides);
+    };
+    exampleNonNeighbourSides2 = function() {
+        example(Example.nonNeighbourSides2);
+    };
+    exampleParabolaVertex = function() {
+        example(Example.parabolaVertex);
+    };
+    exampleTwoBisectors = function() {
+        example(Example.twoBisectors);
+    };
+    exampleThreeSides = function() {
+        example(Example.threeSides);
+    };
+    acTestThreeVertexes = function() {
+        Example.acTestThreeVertexes();
         currentVertexes = Example.vertexes;
         currentPolygon = Example;
         createInfoTable(currentPolygon);
     };
-    ex1 = function() {
-        Example.square();
+    acTestTwoSidesAndVertex = function() {
+        Example.acTestTwoSidesAndVertex();
         currentVertexes = Example.vertexes;
         currentPolygon = Example;
         createInfoTable(currentPolygon);
     };
-    ex2 = function() {
-        Example.parabolic();
-        currentVertexes = Example.vertexes;
-        currentPolygon = Example;
-        createInfoTable(currentPolygon);
-    };
-    ex3 = function() {
-        Example.simple();
-        currentVertexes = Example.vertexes;
-        currentPolygon = Example;
-        createInfoTable(currentPolygon);
-    };
-    ex4 = function() {
-        Example.anotherSimple();
-        currentVertexes = Example.vertexes;
-        currentPolygon = Example;
-        createInfoTable(currentPolygon);
-    };
-    ex5 = function() {
-        Example.bisectors();
-        currentVertexes = Example.vertexes;
-        currentPolygon = Example;
-        createInfoTable(currentPolygon);
-    }
 });
 

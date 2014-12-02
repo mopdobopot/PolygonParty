@@ -4,87 +4,126 @@
  * Time: 10:48
  */
 var Example = {
-    parallelSides1: function() {
+    build: function(vertexes) {
+        this.dropVertexes();
+        for (var i = 0; i < vertexes.length; i++) {
+            this.addVertex(new Point(vertexes[i][0], vertexes[i][1]));
+        }
+        this.centerAndDraw(720, 500, Drawing.c, true);
+        return this.vertexes;
+    },
+    bisector: [
+        [0, 0],
+        [100, 100],
+        [200, 0],
+        [200, 200],
+        [0, 200]
+    ],
+    twoVertexes: [
+        [0, 0],
+        [200, 0],
+        [160, 120],
+        [120, 80],
+        [160, 40],
+        [40, 40],
+        [80, 80],
+        [40, 120]
+    ],
+    parallelSides1: [
+        [0, 0],
+        [40, 0],
+        [40, 120],
+        [80, 120],
+        [80, 0],
+        [120, 0],
+        [120, 160],
+        [0, 160]
+    ],
+    parallelSides2: [
+        [0, 0],
+        [40, 0],
+        [40, 40],
+        [260, 40],
+        [260, 0],
+        [300, 0],
+        [300, 80],
+        [0, 80]
+    ],
+    nonNeighbourSides: [
+        [0, 0],
+        [40, 80],
+        [120, 80],
+        [160, 0],
+        [160, 120],
+        [0, 120]
+    ],
+    nonNeighbourSides2: [
+        [0, 0],
+        [50, 100],
+        [75, 50],
+        [100, 100],
+        [150, 0],
+        [150, 150],
+        [0, 150]
+    ],
+    parabolaVertex: [
+        [0, 0],
+        [250, 0],
+        [250, 50],
+        [200, 50],
+        [150, 150],
+        [100, 50],
+        [50, 50],
+        [50, 200],
+        [200, 200],
+        [250, 250],
+        [0, 250]
+    ],
+    twoBisectors: [
+        [0, 0],
+        [350, 0],
+        [350, 300],
+        [300, 50],
+        [50, 100],
+        [0, 300]
+    ],
+    threeSides: [
+        [0, 0],
+        [50, 100],
+        [75, 111],
+        [100, 100],
+        [150, 0],
+        [150, 150],
+        [0, 150]
+    ],
+    acTestThreeVertexes: function() {
         this.dropVertexes();
         this.addVertex(new Point(100, 100));
-        this.addVertex(new Point(200, 100));
-        this.addVertex(new Point(200, 250));
-        this.addVertex(new Point(220, 250));
-        this.addVertex(new Point(220, 50));
-        this.addVertex(new Point(300, 100));
-        this.addVertex(new Point(300, 300));
-        this.addVertex(new Point(100, 300));
+        this.addVertex(new Point(400, 100));
+        this.addVertex(new Point(400, 400));
+        this.addVertex(new Point(100, 400));
+        this.addVertex(new Point(200, 230));
+        this.addVertex(new Point(250, 350));
+        this.addVertex(new Point(320, 220));
+        this.addVertex(new Point(240, 200));
+        this.addVertex(new Point(300, 180));
+        this.addVertex(new Point(200, 130));
+        this.addVertex(new Point(200, 170));
         this.centerAndDraw(720, 500, Drawing.c, true);
         return this.vertexes;
     },
-    parallelSides2: function() {
-        this.dropVertexes();
-        this.addVertex(new Point(100, 100));
-        this.addVertex(new Point(110, 100));
-        this.addVertex(new Point(110, 250));
-        this.addVertex(new Point(470, 250));
-        this.addVertex(new Point(470, 50));
-        this.addVertex(new Point(550, 100));
-        this.addVertex(new Point(550, 300));
-        this.addVertex(new Point(100, 300));
-        this.centerAndDraw(720, 500, Drawing.c, true);
-        return this.vertexes;
-    },
-    square: function() {
-        this.dropVertexes();
-        this.addVertex(new Point(100, 100));
-        this.addVertex(new Point(300, 100));
-        this.addVertex(new Point(300, 150));
-        this.addVertex(new Point(350, 150));
-        this.addVertex(new Point(350, 200));
-        this.addVertex(new Point(100, 200));
-        this.centerAndDraw(720, 500, Drawing.c, true);
-        return this.vertexes;
-    },
-    parabolic: function() {
+    acTestTwoSidesAndVertex: function() {
         this.dropVertexes();
         this.addVertex(new Point(0, 0));
-        this.addVertex(new Point(250, 0));
-        this.addVertex(new Point(250, 50));
-        this.addVertex(new Point(200, 50));
-        this.addVertex(new Point(150, 150));
-        this.addVertex(new Point(100, 50));
-        this.addVertex(new Point(50, 50));
-        this.addVertex(new Point(50, 200));
-        this.addVertex(new Point(250, 200));
-        this.addVertex(new Point(250, 250));
-        this.addVertex(new Point(0, 250));
-        this.centerAndDraw(720, 500, Drawing.c, true);
-        return this.vertexes;
-    },
-    simple: function() {
-        this.dropVertexes();
-        this.addVertex(new Point(0, 0));
-        this.addVertex(new Point(100, 200));
-        this.addVertex(new Point(200, 0));
-        this.addVertex(new Point(200, 300));
-        this.addVertex(new Point(0, 300));
-        this.centerAndDraw(720, 500, Drawing.c, true);
-        return this.vertexes;
-    },
-    anotherSimple: function() {
-        this.dropVertexes();
-        this.addVertex(new Point(0, 0));
-        this.addVertex(new Point(50, 100));
-        this.addVertex(new Point(300, 50));
-        this.addVertex(new Point(300, 150));
-        this.addVertex(new Point(0, 150));
-        this.centerAndDraw(720, 500, Drawing.c, true);
-        return this.vertexes;
-    },
-    bisectors: function() {
-        this.dropVertexes();
-        this.addVertex(new Point(0, 0));
-        this.addVertex(new Point(350, 0));
-        this.addVertex(new Point(350, 300));
-        this.addVertex(new Point(300, 50));
-        this.addVertex(new Point(50, 100));
-        this.addVertex(new Point(0, 300));
+        this.addVertex(new Point(400, 0));
+        this.addVertex(new Point(240, 80));
+        this.addVertex(new Point(160, 160));
+        this.addVertex(new Point(160, 80));
+        this.addVertex(new Point(50, 80));
+        this.addVertex(new Point(50, 400));
+        this.addVertex(new Point(160, 400));
+        this.addVertex(new Point(160, 480));
+        this.addVertex(new Point(0, 480));
         this.centerAndDraw(720, 500, Drawing.c, true);
         return this.vertexes;
     }

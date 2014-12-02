@@ -110,6 +110,24 @@ var Drawing = (function() {
                 drawPointNumber(context, vertexes[l - 1], l - 1);
             }
         },
+        drawAngleSign: function(v1, v2, point, color, context) {
+            var c = context || this.c;
+            if (v1.getAlpha(v2) > Math.PI) {
+                var temp = v1;
+                v1 = v2;
+                v2 = temp;
+            }
+            var e = new Vector(1, 0);
+            var a1 = e.getAlpha(v1);
+            var a2 = e.getAlpha(v2);
+            c.beginPath();
+            c.strokeStyle = color;
+            c.moveTo(point.x, point.y);
+            c.arc(point.x, point.y, 10, a1, a2);
+            c.lineTo(point.x, point.y);
+            c.closePath();
+            c.stroke();
+        },
         drawLine: function(line, color, context) {
             var c = context || this.c;
             var v = line.getDirectingVector().getMulOnScalar(1000);

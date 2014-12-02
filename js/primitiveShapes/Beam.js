@@ -25,6 +25,9 @@ function Beam(point, vector) {
     this.getDirectingVector = function() {
         return this.vector;
     };
+    this.getLine = function() {
+        return this.line;
+    };
     //Может вернуть @Beam, @Segment, @Point или null
     this.getIntersectionWithBeam = function(beam) {
         var intersec = this.line.getIntersectionWithBeam(beam);

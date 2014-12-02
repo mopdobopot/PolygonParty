@@ -4,7 +4,7 @@
  * Time: 10:20
  */
 var BaseTest = {
-    eps: 0.0000001,
+    eps: 10e-6,
     logFailure: function(testName, whatsWrong) {
         console.error("FAILURE:\t" + testName + ", " + whatsWrong);
     },

@@ -7,10 +7,13 @@ var IO = (function() {
 
     var vertexes2String = function(vertexes) {
         var ans = vertexes.length + "\n";
+        ans += "[\n";
         for (var i = 0; i < vertexes.length; i++) {
-            ans += vertexes[i].x + " " + vertexes[i].y + "\n";
+            ans += "[" +
+            vertexes[i].x + ", " + vertexes[i].y +
+            (i == vertexes.length - 1 ? "]\n" : "],\n");
         }
-        return ans;
+        return ans += "]";
     };
 
     return {

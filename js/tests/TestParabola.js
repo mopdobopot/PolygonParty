@@ -43,6 +43,16 @@ var TestParabola = {
             if (!res.p[0].equalsToPoint(new Point(0, 0)))
                 throw new Error("пересечение с прямой x = 0 найдено не верно");
 
+            f = new Point(-2, 2);
+            p1 = new Point(0, 0);
+            p2 = new Point(1, 1);
+            d = new Line(p1, p2);
+            p3 = new Point(0, 10);
+            l = new Line(p1, p3);
+            res = new Parabola(f, d).getIntersectionWithLine(l);
+            if (res.pointAmount != 1)
+                throw new Error("парабола касается прямой, но найдено " + res.pointAmount + " пересечений");
+
             f = new Point(1, 0);
             p1 = new Point(-1, 1);
             p2 = new Point(-1, -1);

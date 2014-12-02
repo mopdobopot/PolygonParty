@@ -4,7 +4,7 @@
  * Time: 14:31
  */
 var Config = {
-    debugDrawing: true,
+    debugDrawing: false,
 
     polygonFileName: "p",
 
@@ -21,12 +21,15 @@ var Config = {
     zeroPointEps: 0.0000001,
     //Точность, с которой точка считается лежащей на параболе
     pointOnParabolaEps: 0.0001,
-    quadraticEquationEps: 0.000001,
+    quadraticEquationEps: 10e-7,
     //Угол, примерно равный 0.06 градуса, считается за 0 при определении сонаправленности векторов
     sameDirectingEps: 0.001,
     //Точность "выпукливания" звёздчатого многоугольника
     stretchingEps: 0.0000001,
     //Точность определения совпадения прямых
     linesEqualsEps: 0.0001,
-    linesParallelEps: this.eps
+    linesParallelEps: this.eps,
+
+    //Точность вычисления альфа-выпуклости
+    alphaConvexityEps: 0.01
 };

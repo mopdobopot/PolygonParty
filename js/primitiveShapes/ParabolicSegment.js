@@ -24,9 +24,14 @@ function ParabolicSegment(parabola, pointA, vectorA, pointB, vectorB) {
        return this.a;
     };
     this.isPointOn = function(point) {
-        var beam1 = new ParabolicBeam(this.parabola, this.a, this.vectorA);
-        var beam2 = new ParabolicBeam(this.parabola, this.b, this.vectorB);
-        return beam1.isPointOn(point) && beam2.isPointOn(point);
+        if (point.equalsToPoint(this.a) || point.equalsToPoint(this.b)) {
+            return true;
+        }
+        else {
+            var beam1 = new ParabolicBeam(this.parabola, this.a, this.vectorA);
+            var beam2 = new ParabolicBeam(this.parabola, this.b, this.vectorB);
+            return beam1.isPointOn(point) && beam2.isPointOn(point);
+        }
     };
     this.getIntersectionWithParabolicSegment = function(pSeg) {
         var intersec = G.getIntersection(this.parabola, pSeg.parabola);
@@ -38,21 +43,41 @@ function ParabolicSegment(parabola, pointA, vectorA, pointB, vectorB) {
                 }
                 //pSeg.b не лежит в this
                 else if (pSeg.isPointOn(this.a)) {
-                    return new ParabolicSegment(this.parabola, this.a, this.vectorA, pSeg.a, pSeg.vectorA);
+                    if (this.a.equalsToPoint(pSeg.a)) {
+                        return this.a;
+                    }
+                    else {
+                        return new ParabolicSegment(this.parabola, this.a, this.vectorA, pSeg.a, pSeg.vectorA);
+                    }
                 }
                 else if (pSeg.isPointOn(this.b)) {
-                    return new ParabolicSegment(this.parabola, this.b, this.vectorB, pSeg.a, pSeg.vectorA);
+                    if (this.b.equalsToPoint(pSeg.a)) {
+                        return this.b;
+                    }
+                    else {
+                        return new ParabolicSegment(this.parabola, this.b, this.vectorB, pSeg.a, pSeg.vectorA);
+                    }
                 }
             }
             else if (this.isPointOn(pSeg.b)) {
                 if (pSeg.isPointOn(this.a)) {
-                    return new ParabolicSegment(this.parabola, this.a, this.vectorA, pSeg.b, pSeg.vectorB);
+                    if (this.a.equalsToPoint(pSeg.b)) {
+                        return this.a;
+                    }
+                    else {
+                        return new ParabolicSegment(this.parabola, this.a, this.vectorA, pSeg.b, pSeg.vectorB);
+                    }
                 }
                 else if (pSeg.isPointOn(this.b)) {
-                    return new ParabolicSegment(this.parabola, this.b, this.vectorB, pSeg.b, pSeg.vectorB);
+                    if (this.b.equalsToPoint(pSeg.b)) {
+                        return this.b;
+                    }
+                    else {
+                        return new ParabolicSegment(this.parabola, this.b, this.vectorB, pSeg.b, pSeg.vectorB);
+                    }
                 }
             }
-            //Ни один конец pSeg не лежит в this => this целиком лежит в pSeg
+            //Ни один конец pSeg не лежит в this => или this целиком лежит в pSeg
             else if (pSeg.isPointOn(this.a) && pSeg.isPointOn(this.b)) {
                 return this;
             }

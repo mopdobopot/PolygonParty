@@ -60,9 +60,7 @@ function Vector(a, b) {
     };
     this.getMinAlpha = function(v) {
         var cos = this.getScalarProduct(v) / this.module / v.module;
-        cos = (cos > 1) ? 1
-                        : (cos < -1) ? -1
-                                     : cos;
+        cos = (cos > 1) ? 1 : (cos < -1) ? -1 : cos;
         return Math.acos(cos);
     };
     this.sameDirected = function(v) {
