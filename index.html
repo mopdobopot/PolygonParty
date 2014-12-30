@@ -41,6 +41,8 @@
     <script src="js/primitiveShapes/Parabola.js"></script>
     <script src="js/primitiveShapes/ParabolicBeam.js"></script>
     <script src="js/primitiveShapes/ParabolicSegment.js"></script>
+
+    <script src="js/UI/Button.js"></script>
 </head>
 <body>
     <div class="appWrapper">
@@ -53,7 +55,6 @@
                         <option>Выпуклый многоугольник</option>
                         <option>Звёздный многоугольник</option>
                     </select>
-                    <button id="generateButton">Нарисовать</button>
                 </div>
 
                 <div id="vertexAmountOption" class="option">
@@ -124,14 +125,14 @@
                     </div>
                 </div>
 
-                    <div id="fileNameOption" class="option">
-                        <div id="fileNameLabel" class="label"></div>
-                        <input type="text" name="fileName">
-                    </div>
+                <div id="fileNameOption" class="option">
+                    <div id="fileNameLabel" class="label"></div>
+                    <input type="text" name="fileName">
+                </div>
 
-                    <div id="saveButtonOption" class="option">
-                        <button id="saveButton">Сохранить</button>
-                    </div>
+                <div id="saveButtonOption" class="option">
+                    <button id="saveButton">Сохранить</button>
+                </div>
 
             </div>
             <div class="canvasBlock">

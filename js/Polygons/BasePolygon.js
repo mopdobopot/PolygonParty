@@ -146,6 +146,7 @@ var BasePolygon = (function() {
             if (currentPiece === null) {
                 return null;
             }
+            //Отключено чтобы избежать проблем с пересечением двух параболических линий
             //currentPiece = peakCutFromParabolicSegment(peak, currentPiece);
             return currentPiece;
         },
@@ -219,6 +220,7 @@ var BasePolygon = (function() {
         type: "Не определён",
         peaks: [],
         sides: [],
+        alphaConvexity: undefined,
 
         dropVertexes: function() {
             this.vertexes = [];
@@ -529,6 +531,7 @@ var BasePolygon = (function() {
             if (finalRes.msg) {
                 console.log(finalRes.msg);
             }
+            this.alphaConvexity = finalRes.alpha;
             return finalRes.alpha;
         },
 

@@ -116,7 +116,7 @@ $(document).ready(function() {
 
     var select_polygonType = $('select#polygonTypeSelect'),
         polygonType = convexPolygonName,
-        button_generate = $('#generateButton'),
+        button_generate = new Button($('#polygonTypeOption'), 'generateButton', 'Рисовать').$elem,
         button_save = $('#saveButton'),
         currentPolygon,
         currentVertexes = [];
@@ -274,7 +274,7 @@ $(document).ready(function() {
         redraw();
     });
 
-    // Кнопка "Нарисовать" ---------------------------------------------------------------------------------------------|
+    // Кнопка "Рисовать" ---------------------------------------------------------------------------------------------|
 
     button_generate.click(function() {
         generateAndDrawPolygon();
