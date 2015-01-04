@@ -398,21 +398,6 @@ var BasePolygon = (function() {
                     return false;
                 }
             };
-            var checkTwoSidesBisectorIfNeighbours = function(a, b, biSeg) {
-                if (biSeg) {
-                    var sameVertex = areSidesNeighbours(a, b);
-                    if (sameVertex) {
-                        var p1 = a.a == sameVertex ? a.b : a.a;
-                        var p2 = b.a == sameVertex ? b.b : b.a;
-                        var res = new Res();
-                        res.seg1 = new Segment(p1, sameVertex);
-                        res.seg2 = new Segment(p2, sameVertex);
-                        res.line = biSeg.getLine();
-                        res.alpha = Math.PI - a.getDirectingVector().getMulOnScalar(-1).getAlpha(b.getDirectingVector());
-                        updateRes(res, "any point on bisector of 2 neighbour sides");
-                    }
-                }
-            };
             //Вершины
             for (var i = 0; i < peaks.length - 2; i++) {
                 a = peaks[i].vertex;
@@ -521,15 +506,12 @@ var BasePolygon = (function() {
                     a = sides[i];
                     b = sides[j];
                     var biSeg1 = getPieceForSideSide(a, b);
-                    checkTwoSidesBisectorIfNeighbours(a, b, biSeg1);
                     checkBestPointForBisector(biSeg1, a, b);
                     for (k = j + 1; k < sides.length; k++) {
                         c = sides[k];
                         var biSeg2 = getPieceForSideSide(b, c);
-                        checkTwoSidesBisectorIfNeighbours(b, c, biSeg2);
                         checkBestPointForBisector(biSeg2, b, c);
                         var biSeg3 = getPieceForSideSide(c, a);
-                        checkTwoSidesBisectorIfNeighbours(c, a, biSeg3);
                         checkBestPointForBisector(biSeg3, c, a);
                         if (biSeg1 && biSeg2) {
                             x = G.getIntersection(biSeg1, biSeg2);
