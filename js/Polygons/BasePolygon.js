@@ -278,6 +278,9 @@ var BasePolygon = (function() {
         },
 
         getAlphaConvexity: function() {
+            //В треугольнике вершины нумеруются как повезёт, поэтому алгоритм может работать некорректно
+            if (this.vertexes.length == 3) return 0;
+
             var preCalc = calcSidesAndPeaks(this.vertexes);
             var peaks = preCalc.peaks;
             var sides = preCalc.sides;
@@ -368,8 +371,14 @@ var BasePolygon = (function() {
                     if (G.isPointAtDistanceToPolygon(x, x.distToSegment(side1), _thisref.vertexes)) {
                         updateRes(
                             new Res(
-                                G.getIntersection(side1, new Line(x, x.getShiftedByVector(side1.getLine().getNormalVector()))),
-                                G.getIntersection(side2, new Line(x, x.getShiftedByVector(side2.getLine().getNormalVector()))),
+                                G.getIntersection(
+                                    side1,
+                                    new Line(x, x.getShiftedByVector(side1.getLine().getNormalVector()))
+                                ),
+                                G.getIntersection(
+                                    side2,
+                                    new Line(x, x.getShiftedByVector(side2.getLine().getNormalVector()))
+                                ),
                                 x,
                                 biseg
                             ),
@@ -441,7 +450,10 @@ var BasePolygon = (function() {
                             checkBestPointForParabola(parabola1, c);
                             x = G.getIntersection(abLine, parabola1);
                             if (x != null && G.isPointAtDistanceToPolygon(x, G.dist(x, a), _thisref.vertexes)) {
-                                var h = G.getIntersection(cLine, new Line(x, x.getShiftedByVector(cLine.getNormalVector())));
+                                var h = G.getIntersection(
+                                    cLine,
+                                    new Line(x, x.getShiftedByVector(cLine.getNormalVector()))
+                                );
                                 var res1 = new Res(a, h, x, abLine, parabola1);
                                 var res2 = new Res(b, h, x, abLine, parabola1);
                                 var res3 = new Res(a, b, x, abLine, parabola1);
@@ -461,8 +473,14 @@ var BasePolygon = (function() {
                         var bisectorPiece = getPieceForSideSide(b, c);
                         var checkPoint = function(x, a, b, c, bisector, parabola) {
                             if (x != null && G.isPointAtDistanceToPolygon(x, G.dist(x, a), _thisref.vertexes)) {
-                                var hb = G.getIntersection(b.getLine(), new Line(x, x.getShiftedByVector(b.getLine().getNormalVector())));
-                                var hc = G.getIntersection(c.getLine(), new Line(x, x.getShiftedByVector(c.getLine().getNormalVector())));
+                                var hb = G.getIntersection(
+                                    b.getLine(),
+                                    new Line(x, x.getShiftedByVector(b.getLine().getNormalVector()))
+                                );
+                                var hc = G.getIntersection(
+                                    c.getLine(),
+                                    new Line(x, x.getShiftedByVector(c.getLine().getNormalVector()))
+                                );
                                 res1 = new Res(hb, hc, x, bisector, parabola);
                                 res2 = new Res(hb, a, x, bisector, parabola);
                                 res3 = new Res(hc, a, x, bisector, parabola);

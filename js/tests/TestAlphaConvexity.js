@@ -53,6 +53,16 @@ var TestAlphaConvexity = {
                 throw new Error("Случай с тремя сторонами, угол должен быть 2.0323");
             }
 
+            example(Example.random1);
+            if (Math.abs(Example.alphaConvexity - 3.0638) >= Config.alphaConvexityEps) {
+                throw new Error("Ошибка в Example.random1, биссектриса сторон 6-7 и 8-9 должна давать угол 3.0638");
+            }
+
+            example(Example.random2);
+            if (Math.abs(Example.alphaConvexity - 2.7340) >= Config.alphaConvexityEps) {
+                throw new Error("Ошибка в Example.random2, биссектриса угла 4-5-0 должна давать угол 2.7340");
+            }
+
             acTestThreeVertexes();
             if (Math.abs(Example.alphaConvexity - Math.PI) >= Config.alphaConvexityEps) {
                 throw new Error("Случай с двумя вершинами")

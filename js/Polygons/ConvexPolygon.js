@@ -19,10 +19,10 @@ var ConvexPolygon = (function() {
                 curAlpha += alpha;
                 this.addVertex(new Point(r * Math.cos(curAlpha), r * Math.sin(curAlpha)));
             }
-            if (n === 3) {
-                this.type = "Равносторонний";
+            if (n == 3) {
+                this.type = "Равносторонний треуголник";
             }
-            else if (n === 4) {
+            else if (n == 4) {
                 this.type = "Квадрат";
             }
             else {

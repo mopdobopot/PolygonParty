@@ -110,6 +110,14 @@ var Example = {
         [578.470026331488, 41.72105417819694],
         [477, 389]
     ],
+    random2: [
+        [352, 276],
+        [237, 187],
+        [506, 139],
+        [443, 380],
+        [388, 324],
+        [448, 186]
+    ],
     acTestThreeVertexes: function() {
         this.dropVertexes();
         this.addVertex(new Point(100, 100));
