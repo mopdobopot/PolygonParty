@@ -2,7 +2,7 @@
  * Created by mopdobopot on 04.01.2015.
  */
 
-function InfoTable($container, id) {
+function InfoTable() {
 
     var makeInfoObject = function(polygon) {
         return {
@@ -26,15 +26,18 @@ function InfoTable($container, id) {
     };
 
     return {
-        $container: $container,
-        $elem: undefined,
-        id: id,
 
-        init: function(polygon) {
+        $container: undefined,
+        $elem: undefined,
+        id: undefined,
+
+        init: function($container, id, polygon) {
+            this.$container = $container;
             this.$container.append(
-                "<table id=" + this.id + "></table>"
+                "<table id=" + id + "></table>"
             );
-            this.$elem = $('#' + this.id);
+            this.$elem = $('#' + id);
+            this.id = id;
             this.update(polygon);
             return this;
         },
@@ -42,6 +45,9 @@ function InfoTable($container, id) {
             if (polygon != undefined && polygon != null) {
                 this.$elem.html(infoObjectToHTML(makeInfoObject(polygon)));
             }
+        },
+        clear: function() {
+            this.$elem.html("");
         }
     }
 }

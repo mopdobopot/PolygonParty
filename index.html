@@ -44,6 +44,14 @@
 
     <script src="js/UI/Button.js"></script>
     <script src="js/UI/InfoTable.js"></script>
+    <script src="js/UI/Canvas.js"></script>
+    <script src="js/UI/CurState.js"></script>
+    <script src="js/UI/Select.js"></script>
+    <script src="js/UI/Checkbox.js"></script>
+    <script src="js/UI/Input.js"></script>
+    <script src="js/UI/NumberInput.js"></script>
+    <script src="js/UI/TextInput.js"></script>
+    <script src="js/UI/RadioButton.js"></script>
 </head>
 <body>
     <div class="appWrapper">
@@ -52,96 +60,49 @@
             <div class="optionsBlock">
 
                 <div id="polygonTypeOption" class="option">
-                    <select id="polygonTypeSelect">
-                        <option>Выпуклый многоугольник</option>
-                        <option>Звёздный многоугольник</option>
-                    </select>
                 </div>
 
                 <div id="vertexAmountOption" class="option">
-                    <div id="vertexAmountLabel" class="label">Количество вершин (три или больше)</div>
-                    <input type="number" name="vertexAmount" min="3">
                 </div>
 
-                <div id="nonConvexityDegreeBlock" class="option">
-                    <div id="randomNonConvexityDegreeOption" class="option radioButton">
-                        <input type="radio" name="nonConvexityOption" value="randomDegree">
-                        <div class="inline-label">любой</div>
-                    </div>
-                    <div id="definedNonConvexityDegreeOption" class="option radioButton">
-                        <input type="radio" name="nonConvexityOption" value="definedDegree">
-                        <div class="inline-label">указать степень невыпуклости</div>
+                <div id="nonConvexityDegreeBlock">
+                    <div class="option">
                     </div>
                     <div id="nonConvexityDegreeOption" class="option">
-                        <div id="nonConvexityDegreeLabel" class="label">Угол в градусах (от 0 до 180)</div>
-                        <input type="number" name="nonConvexityDegree" min="0" max="180">
                     </div>
                 </div>
 
                 <div id="regularOption" class="option">
-                    <input type="checkbox" name="regular">
-                    <div class="inline-label">правильный</div>
                 </div>
 
                 <div id="rectangleOptionsBlock" class="option">
-                    <div id="randomRectangleOption" class="option radioButton">
-                        <input type="radio" name="rectangleOption" value="randomRectangle">
-                        <div class="inline-label">любой</div>
-                    </div>
-                    <div id="trapezeOption" class="option radioButton">
-                        <input type="radio" name="rectangleOption" value="trapeze">
-                        <div class="inline-label">трапеция</div>
-                    </div>
-                    <div id="parallelogramOption" class="option radioButton">
-                        <input type="radio" name="rectangleOption" value="parallelogram">
-                        <div class="inline-label">параллелограмм</div>
-                    </div>
                 </div>
 
                 <div id="vertexNumbersOption" class="option">
-                    <input type="checkbox" name="withNumbers">
-                    <div class="inline-label">показывать номера вершин</div>
                 </div>
 
-                <div class="separator"></div>
+                <div class="separator">
+                </div>
 
                 <span id="saveOptionsToggle">Дополнительные параметры</span>
 
                 <div id="saveOptionsBlock">
                     <div id="polygonAmountOption" class="option">
-                        <div id="polygonAmountLabel" class="label">Сколько будем генерировать?</div>
-                        <input type="number" name="polygonAmount" min="1">
                     </div>
-                    <div id="oneFileOption" class="option radioButton disabled">
-                        <input type="radio" name="saveToFileOption" value="oneFile">
-                        <div class="inline-label">в один файл</div>
-                    </div>
-                    <div id="manyFilesOption" class="option radioButton disabled">
-                        <input type="radio" name="saveToFileOption" value="manyFiles">
-                        <div class="inline-label">в разные файлы</div>
+                    <div id="fileAmountOption" class="option">
                     </div>
                     <div id="imageOption" class="option">
-                        <input type="checkbox" name="imageCheck">
-                        <div id="imageOptionLabel" class="inline-label"></div>
                     </div>
                 </div>
 
                 <div id="fileNameOption" class="option">
-                    <div id="fileNameLabel" class="label"></div>
-                    <input type="text" name="fileName">
                 </div>
 
                 <div id="saveButtonOption" class="option">
-
                 </div>
 
             </div>
             <div class="canvasBlock">
-                <canvas id="canvas" width="720" height="500">
-                </canvas>
-                <canvas id="csCanvas">
-                    Ваш браузер не поддерживает canvas
-                </canvas>
             </div>
             <div style="clear: both"></div>
         </div>

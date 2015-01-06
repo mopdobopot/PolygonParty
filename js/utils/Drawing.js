@@ -94,20 +94,21 @@ var Drawing = (function() {
             $('#infoTable').html("");
         },
         drawPolygon: function(vertexes, context, width, height, isVertexNumberNeeded) {
-            this.clearCanvas(context, width, height);
+            var c = context || this.c;
+            this.clearCanvas(c, width, height);
             var l = vertexes.length,
                 color = Config.polygonColor;
             for (var i = 0; i < l - 1; i++) {
-                Config.animatedDrawing ? drawAnimateLine(context, color, vertexes[i], vertexes[i + 1])
-                                       : drawLine(context, color, vertexes[i], vertexes[i + 1]);
+                Config.animatedDrawing ? drawAnimateLine(c, color, vertexes[i], vertexes[i + 1])
+                                       : drawLine(c, color, vertexes[i], vertexes[i + 1]);
                 if (isVertexNumberNeeded) {
-                    drawPointNumber(context, vertexes[i], i);
+                    drawPointNumber(c, vertexes[i], i);
                 }
             }
-            Config.animatedDrawing ? drawAnimateLine(context, color, vertexes[l - 1], vertexes[0])
-                                   : drawLine(context, color, vertexes[l - 1], vertexes[0]);
+            Config.animatedDrawing ? drawAnimateLine(c, color, vertexes[l - 1], vertexes[0])
+                                   : drawLine(c, color, vertexes[l - 1], vertexes[0]);
             if (isVertexNumberNeeded) {
-                drawPointNumber(context, vertexes[l - 1], l - 1);
+                drawPointNumber(c, vertexes[l - 1], l - 1);
             }
         },
         drawAngleSign: function(v1, v2, point, color, context) {

@@ -2,27 +2,34 @@
  * Created by mopdobopot on 30.12.2014.
  */
 
-function Button($container, id, textValue) {
+function Button() {
 
     return {
-        $container: $container,
+
+        $container: undefined,
         $elem: undefined,
-        id: id,
-        textValue: textValue,
+        id: undefined,
+        textValue: undefined,
         state: ButtonState.ENABLED,
 
-        init: function(state) {
+        init: function($container, id, textValue, defaultState, onClickFunc) {
+            this.$container = $container;
             this.$container.append(
-                "<button id=" + this.id + ">" + this.textValue + "</button>"
+                "<button id=" + id + ">" + textValue + "</button>"
             );
-            this.$elem = $('#' + this.id);
-            if (state != undefined) {
-                this.updateState(state);
+            this.$elem = $('#' + id);
+            this.$elem.click(function() {
+                if (onClickFunc) onClickFunc();
+            });
+            this.id = id;
+            this.textValue = textValue;
+            if (defaultState) {
+                this.setState(defaultState);
             }
             return this;
         },
-        updateState: function(state) {
-            switch (state) {
+        setState: function(newState) {
+            switch (newState) {
                 case ButtonState.DISABLED:
                     this.$elem.attr('disabled', true);
                     break;
@@ -32,13 +39,13 @@ function Button($container, id, textValue) {
                 default:
                     throw new Error('Unknown Button state');
             }
-            this.state = state;
+            this.state = newState;
         },
         enable: function() {
-            this.updateState(ButtonState.ENABLED);
+            this.setState(ButtonState.ENABLED);
         },
         disable: function() {
-            this.updateState(ButtonState.DISABLED);
+            this.setState(ButtonState.DISABLED);
         }
     }
 }

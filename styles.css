@@ -139,7 +139,7 @@ CANVAS {
 .label.error {
     color: #e04646;
 }
-.disabled {
+.displayNone {
     display: none;
 }
 #infoTable {
@@ -170,7 +170,7 @@ CANVAS {
 }
 #regularOption {
     min-height: 14px;
-    margin-top: 12px;
+    margin-top: 16px;
 }
 #imageOption {
     min-height: 18px;

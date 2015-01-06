@@ -5,90 +5,35 @@
  */
 $(document).ready(function() {
 
-    /* Холст */
-
-    var canvasId = "canvas",
-        coordinateSystemCanvasId = "csCanvas",
-        $canvas = $("#" + canvasId),
-        canvas = document.getElementById(canvasId),
-        context = canvas.getContext("2d"),
+    var div_canvasBlock = $('div.canvasBlock');
+    var canvas = new Canvas().init(
+            div_canvasBlock,
+            'canvas',
+            'csCanvas',
+            720, 500
+        ),
+        //local aliases
         w = canvas.width,
-        h = canvas.height,
-        csCanvas = document.getElementById(coordinateSystemCanvasId),
-        csContext = csCanvas.getContext("2d");
-
-    Drawing.c = context;
-    DebugDrawing.c = context;
-    csCanvas.width = w;
-    csCanvas.height = h;
-    Drawing.drawCoordinateSystem(csContext, w, h);
-
-    var clickedVertex,
-        clone = function(obj) {
-            return $.extend(true, {}, obj); //Глубокое клонирование
-        };
-
-    $canvas.mousedown(function(e) {
-        if (currentPolygon === undefined) return;
-        $canvas.css('cursor', 'default');
-        var i = tryToFindVertex({x: e.offsetX, y: e.offsetY}, currentVertexes);
-        if (i || i === 0) {
-            currentVertexes[i].isClicked = true;
-            clickedVertex = clone(currentVertexes[i]);
-            clickedVertex.index = i;
-            redraw();
-        }
-    });
-    $canvas.mouseup(function() {
-        if (currentPolygon === undefined) return;
-        for (var i = 0; i < currentVertexes.length; i++) {
-            currentVertexes[i].isClicked = undefined;
-        }
-        clickedVertex = undefined;
-        redraw();
-    });
-    $canvas.mousemove(function(e) {
-        if (currentPolygon === undefined) return;
-        if (clickedVertex) {
-            clickedVertex.x = e.offsetX;
-            clickedVertex.y = e.offsetY;
-            currentVertexes[clickedVertex.index] = clone(clickedVertex);
-            redraw();
-        }
-        else {
-            var i = tryToFindVertex({x: e.offsetX, y: e.offsetY}, currentVertexes);
-            (i || i === 0) ? $canvas.css('cursor', 'pointer') : $canvas.css('cursor', 'default');
-        }
-    });
-
-    var tryToFindVertex = function(v, vertexes) {
-            var w;
-            for (var i = 0; i < vertexes.length; i++) {
-                w = vertexes[i];
-                if (Math.abs(w.x - v.x) <= Config.vertexRadius &&
-                    Math.abs(w.y - v.y) <= Config.vertexRadius) {
-                    return i;
-                }
-            }
-            return false;
-        };
-
-    /* Интерфейс */
+        h = canvas.height;
 
     var convexPolygonName = "Выпуклый многоугольник",
         starPolygonName = "Звёздный многоугольник";
 
+    CurState.polygonType = convexPolygonName;
+    CurState.infoTable = new InfoTable().init(
+        div_canvasBlock,
+        'infoTable',
+        CurState.polygon
+    );
+
     // Общие методы ----------------------------------------------------------------------------------------------------|
 
-    var disable = function(object) {
-            object.addClass('disabled');
+    var hide = function(object) {
+            object.addClass('displayNone');
             unError(object);
         },
-        enable = function(object) {
-            object.removeClass('disabled');
-        },
-        error = function(object) {
-            object.children().addClass('error');
+        show = function(object) {
+            object.removeClass('displayNone');
         },
         unError = function(object) {
             object.children().removeClass('error');
@@ -96,120 +41,8 @@ $(document).ready(function() {
         checkRadioButton = function(radioButton) {
             radioButton.attr('checked', true);
         },
-        checkCheckBox = function(checkbox) {
-            checkbox.prop('checked', true);
-        },
-        uncheckCheckBox = function(checkbox) {
-            checkbox.prop('checked', false);
-        },
         isChecked = function(checkBox) {
             return checkBox.prop('checked');
-        };
-
-    // Тип многоугольника ----------------------------------------------------------------------------------------------|
-
-    var select_polygonType = $('select#polygonTypeSelect'),
-        polygonType = convexPolygonName,
-        button_generate = new Button($('#polygonTypeOption'), 'generateButton', 'Рисовать').init(),
-        button_save = new Button($('#saveButtonOption'), 'saveButton', "Сохранить").init(),
-        currentPolygon,
-        currentVertexes = [];
-
-    select_polygonType.change(function() {
-        polygonType = $(this).val();
-        Drawing.clearCanvas(context, w, h);
-        switch (polygonType) {
-            case convexPolygonName:
-                enable(div_regular);
-                disable(div_nonConvexityDegreeBlock);
-                if (input_vertexAmount.val() == 4 && !isChecked(checkbox_regular)) {
-                    enable(div_rectangleTypes);
-                }
-                break;
-            case starPolygonName:
-                disable(div_regular);
-                disable(div_rectangleTypes);
-                enable(div_nonConvexityDegreeBlock);
-                break;
-        }
-    });
-
-    var enableVertexAmount = function() {
-            enable(div_vertexAmount);
-            if (!input_vertexAmount.val()) {
-                input_vertexAmount.val(genRandomVertexesAmount());
-            }
-            if (vertexAmountError) {
-                input_vertexAmount.val(genRandomVertexesAmount());
-                vertexAmountError = false;
-            }
-        },
-        genRandomVertexesAmount = function() {
-            return (3 + Math.random() * 100).toFixed(0);
-        },
-        disableVertexAmount = function() {
-            disable(div_vertexAmount);
-        };
-
-    // Правильный ------------------------------------------------------------------------------------------------------|
-
-    var div_regular = $('div#regularOption'),
-        checkbox_regular = $('input[name = regular]');
-
-    checkbox_regular.change(function() {
-        if (isChecked(checkbox_regular)) {
-            disable(div_rectangleTypes);
-        }
-        else if (input_vertexAmount.val() == 4) {  //именно ==, вдруг там строка
-            enable(div_rectangleTypes);
-        }
-    });
-
-    // Типы четырёхугольников ------------------------------------------------------------------------------------------|
-
-    var div_rectangleTypes = $('div#rectangleOptionsBlock'),
-        radioButton_randomRectangle = $('input[value = randomRectangle]'),
-        radioButton_trapeze = $('input[value = trapeze]'),
-        radioButton_parallelogram = $('input[value = parallelogram]');
-
-    checkRadioButton(radioButton_randomRectangle);
-    disable(div_rectangleTypes);
-
-    // Количество вершин -----------------------------------------------------------------------------------------------|
-
-    var div_vertexAmount = $('div#vertexAmountOption'),
-        input_vertexAmount = $('input[name = vertexAmount]'),
-        vertexAmountError = false;
-
-    input_vertexAmount.val(3);
-
-    input_vertexAmount.keyup(function() {
-        vertexAmountChangeHandler(input_vertexAmount.val());
-    });
-    input_vertexAmount.change(function() {
-        vertexAmountChangeHandler(input_vertexAmount.val());
-    });
-    var vertexAmountChangeHandler = function(value) {
-            if (value < 3 || value == "") {
-                disableButtons();
-                error(div_vertexAmount);
-                vertexAmountError = true;
-            }
-            else if (value == 4 && polygonType == convexPolygonName) {
-                if (!isChecked(checkbox_regular)) {
-                    enable(div_rectangleTypes);
-                }
-                enableButtons();
-                unError(div_vertexAmount);
-                vertexAmountError = false;
-                checkRadioButton(radioButton_randomRectangle);
-            }
-            else {
-                disable(div_rectangleTypes);
-                enableButtons();
-                unError(div_vertexAmount);
-                vertexAmountError = false;
-            }
         },
         enableButtons = function() {
             button_generate.enable();
@@ -220,129 +53,295 @@ $(document).ready(function() {
             button_save.disable();
         };
 
-    // Степень невыпуклости --------------------------------------------------------------------------------------------|
+    // Тип многоугольника ----------------------------------------------------------------------------------------------|
 
-    var div_nonConvexityDegreeBlock = $('div#nonConvexityDegreeBlock'),
-        radioButton_randomNonConvexityDegree = $('input[value = randomDegree]'),
-        radioButton_definedNonConvexityDegree = $('input[value = definedDegree]'),
-        div_nonConvexityDegree = $('div#nonConvexityDegreeOption'),
-        input_nonConvexityDegree = $('input[name = nonConvexityDegree]');
-
-    checkRadioButton(radioButton_randomNonConvexityDegree);
-    disable(div_nonConvexityDegree);
-    disable(div_nonConvexityDegreeBlock);
-    input_nonConvexityDegree.val(45);
-
-    radioButton_definedNonConvexityDegree.change(function() {
-        if (isChecked(radioButton_definedNonConvexityDegree)) {
-            enable(div_nonConvexityDegree);
+    var select_polygonType = new Select().init(
+        $('div#polygonTypeOption'),
+        'polygonTypeSelect',
+        [
+            convexPolygonName,
+            starPolygonName
+        ],
+        convexPolygonName,
+        function(newType) {
+            CurState.polygonType = newType;
+            Drawing.clearCanvas(null, w, h);
+            switch (CurState.polygonType) {
+                case convexPolygonName:
+                    show(div_regular);
+                    hide(div_nonConvexityDegreeBlock);
+                    if (input_vertexAmount.val() == 4 && !checkbox_regular.isChecked()) {
+                        show(div_rectangleTypes);
+                    }
+                    break;
+                case starPolygonName:
+                    hide(div_regular);
+                    hide(div_rectangleTypes);
+                    show(div_nonConvexityDegreeBlock);
+                    break;
+            }
         }
-    });
-    radioButton_randomNonConvexityDegree.change(function() {
-        if (isChecked(radioButton_randomNonConvexityDegree)) {
-            disable(div_nonConvexityDegree);
-        }
-    });
-    input_nonConvexityDegree.keyup(function() {
-        nonConvexityDegreeChangeHandler(input_nonConvexityDegree.val());
-    });
-    input_nonConvexityDegree.change(function() {
-        nonConvexityDegreeChangeHandler(input_nonConvexityDegree.val());
-    });
-    var nonConvexityDegreeChangeHandler = function(value) {
-        if (value < 0 || value > 180 || value == "") {
-            disableButtons();
-            error(div_nonConvexityDegree);
-        }
-        else {
-            enableButtons();
-            unError(div_nonConvexityDegree);
-        }
-    };
+    );
+    CurState.select_polygonType = select_polygonType;
 
-    // Показать номера вершин ------------------------------------------------------------------------------------------|
-
-    var div_showVertexNumbers = $('div#vertexNumbersOption'),
-        checkbox_showVertexNumbers = $('input[name = withNumbers]');
-
-    checkbox_showVertexNumbers.click();
-    checkbox_showVertexNumbers.click(function() {
-        if (currentPolygon === undefined) return;
-        redraw();
-    });
-
-    // Кнопка "Рисовать" ---------------------------------------------------------------------------------------------|
-
-    var infoTable = new InfoTable($('.canvasBlock'), 'infoTable').init(currentPolygon);
-
-    button_generate.$elem.click(function() {
-        generateAndDrawPolygon();
-    });
-    $(document).keydown(function(e) {
-        if (e.keyCode === 13) {
-            generateAndDrawPolygon();
-        }
-    });
+    // Кнопка "Нарисовать" ---------------------------------------------------------------------------------------------|
 
     var generateAndDrawPolygon = function() {
         var n = input_vertexAmount.val();
-        switch (polygonType) {
+        switch (CurState.polygonType) {
             case convexPolygonName:
-                if (isChecked(checkbox_regular)) {
-                    ConvexPolygon.drawRegular(context, w, h, n, h / 2, isChecked(checkbox_showVertexNumbers));
-                    infoTable.update(ConvexPolygon);
+                if (checkbox_regular.isChecked()) {
+                    ConvexPolygon.drawRegular(null, w, h, n, h / 2, checkbox_showVertexNumbers.isChecked());
+                    CurState.infoTable.update(ConvexPolygon);
                 }
                 else if (n == 3) {
-                    Triangle.drawRand(context, w, h, h / 2, isChecked(checkbox_showVertexNumbers));
-                    infoTable.update(Triangle);
+                    Triangle.drawRand(null, w, h, h / 2, checkbox_showVertexNumbers.isChecked());
+                    CurState.infoTable.update(Triangle);
                 }
                 else {
                     if (n == 4) {
                         if (isChecked(radioButton_trapeze)) {
-                            ConvexPolygon.drawTrapeze(context, w, h, h / 2, isChecked(checkbox_showVertexNumbers));
+                            ConvexPolygon.drawTrapeze(null, w, h, h / 2, checkbox_showVertexNumbers.isChecked());
                         }
                         else if (isChecked(radioButton_parallelogram)) {
-                            ConvexPolygon.drawParallelogram(context, w, h, h / 2, isChecked(checkbox_showVertexNumbers));
+                            ConvexPolygon.drawParallelogram(null, w, h, h / 2, checkbox_showVertexNumbers.isChecked());
                         }
                         else if (isChecked(radioButton_randomRectangle)) {
-                            ConvexPolygon.drawRandomQuadrangle(context, w, h, h / 2, isChecked(checkbox_showVertexNumbers));
+                            ConvexPolygon.drawRandomQuadrangle(null, w, h, h / 2, checkbox_showVertexNumbers.isChecked());
                         }
                     }
                     else {
-                        ConvexPolygon.drawRand(context, w, h, n, h / 2, isChecked(checkbox_showVertexNumbers));
+                        ConvexPolygon.drawRand(null, w, h, n, h / 2, checkbox_showVertexNumbers.isChecked());
                     }
-                    infoTable.update(ConvexPolygon);
+                    CurState.infoTable.update(ConvexPolygon);
                 }
                 if (n == 3) {
-                    currentVertexes = Triangle.vertexes;
-                    currentPolygon = Triangle;
+                    CurState.vertexes = Triangle.vertexes;
+                    CurState.polygon = Triangle;
                 }
                 else {
-                    currentVertexes = ConvexPolygon.vertexes;
-                    currentPolygon = ConvexPolygon;
+                    CurState.vertexes = ConvexPolygon.vertexes;
+                    CurState.polygon = ConvexPolygon;
                 }
                 break;
             case starPolygonName:
                 if (isChecked(radioButton_definedNonConvexityDegree)) {
                     var phi = input_nonConvexityDegree.val() / 180 * Math.PI;
-                    StarPolygon.drawRandStretched(context, w, h, n, h, phi, isChecked(checkbox_showVertexNumbers));
+                    StarPolygon.drawRandStretched(null, w, h, n, h, phi, checkbox_showVertexNumbers.isChecked());
                 }
                 else {
-                    StarPolygon.drawRand(context, w, h, n, h, isChecked(checkbox_showVertexNumbers));
+                    StarPolygon.drawRand(null, w, h, n, h, checkbox_showVertexNumbers.isChecked());
                 }
-                infoTable.update(StarPolygon);
-                currentVertexes = StarPolygon.vertexes;
-                currentPolygon = StarPolygon;
+                CurState.infoTable.update(StarPolygon);
+                CurState.vertexes = StarPolygon.vertexes;
+                CurState.polygon = StarPolygon;
                 break;
         }
     };
+    var button_generate = new Button().init(
+            $('#polygonTypeOption'),
+            'generateButton',
+            'Нарисовать',
+            ButtonState.ENABLED,
+            generateAndDrawPolygon
+        );
+    CurState.button_generate = button_generate;
 
-    var redraw = function() {
-            Drawing.drawPolygon(currentVertexes, context, w, h, isChecked(checkbox_showVertexNumbers));
-            currentPolygon.vertexes = currentVertexes;
-            currentPolygon.type = "Не определён";
-            infoTable.update(currentPolygon);
-        };
+    // Кнопка "Сохранить" ----------------------------------------------------------------------------------------------|
+
+    var savePolygonsFunction = function() {
+        var n = input_polygonAmount.val(),
+            name = input_fileName.val();
+        if (name == "") {
+            name = Config.polygonFileName;
+        }
+        if (CurState.vertexes.length == 0) {
+            generateAndDrawPolygon();
+        }
+        if (n == 1) {
+            savePolygons([CurState.vertexes], name, name);
+        }
+        else {
+            if (isChecked(radioButton_manyFiles)) {
+                if (CurState.vertexes.length == 0) {
+                    generateAndDrawPolygon();
+                }
+                savePolygons([CurState.vertexes], name + "1", name + "1");
+                for (var i = 2; i <= n; i++) {
+                    generateAndDrawPolygon();
+                    savePolygons([CurState.vertexes], name + i, name + i);
+                }
+            }
+            else {
+                if (CurState.vertexes.length == 0) {
+                    generateAndDrawPolygon();
+                }
+                var polygonList = [CurState.vertexes];
+                for (i = 1; i < n; i++) {
+                    if (checkbox_image.isChecked()) {
+                        canvas.HTMLElem.toBlob(function(blob) {
+                            saveAs(blob, name + i);
+                        });
+                    }
+                    generateAndDrawPolygon();
+                    polygonList.push(CurState.vertexes);
+                }
+                savePolygons(polygonList, name, name + n);
+            }
+        }
+    };
+    var savePolygons = function(polygonList, txtName, pngName) {
+        IO.writeToSingleFile(polygonList, txtName + ".txt");
+        if (checkbox_image.isChecked()) {
+            canvas.HTMLElem.toBlob(function(blob) {
+                saveAs(blob, pngName + ".png");
+            });
+        }
+    };
+    var button_save = new Button().init(
+            $('#saveButtonOption'),
+            'saveButton',
+            "Сохранить",
+            ButtonState.ENABLED,
+            savePolygonsFunction
+        );
+    CurState.button_save = button_save;
+
+    // Правильный ------------------------------------------------------------------------------------------------------|
+
+    var div_regular = $('div#regularOption');
+    var checkbox_regular = new Checkbox().init(
+        div_regular,
+        'regular',
+        'Правильный',
+        CheckboxState.UNCHECKED,
+        null,
+        function() {
+            if (input_vertexAmount.val() == 4) {
+                hide(div_rectangleTypes);
+            }
+        },
+        function() {
+            if (input_vertexAmount.val() == 4) {
+                show(div_rectangleTypes);
+            }
+        }
+    );
+    CurState.checkbox_regular = checkbox_regular;
+
+    // Типы четырёхугольников ------------------------------------------------------------------------------------------|
+
+    var div_rectangleTypes = $('div#rectangleOptionsBlock'),
+        radioButtons_rectangleTypes = new RadioButton().init(
+            div_rectangleTypes,
+            'rectangleOption',
+            [
+                {
+                    value: 'randomRectangle',
+                    label: 'любой'
+                },
+                {
+                    value: 'trapeze',
+                    label: 'трапеция'
+                },
+                {
+                    value: 'parallelogram',
+                    label: 'параллелограмм'
+                }
+            ],
+            'randomRectangle'
+        ),
+        radioButton_randomRectangle = radioButtons_rectangleTypes.$elems['randomRectangle'],
+        radioButton_trapeze = radioButtons_rectangleTypes.$elems['trapeze'],
+        radioButton_parallelogram = radioButtons_rectangleTypes.$elems['parallelogram'];
+
+    checkRadioButton(radioButton_randomRectangle);
+    hide(div_rectangleTypes);
+
+    // Количество вершин -----------------------------------------------------------------------------------------------|
+
+    var div_vertexAmount = $('div#vertexAmountOption');
+    var input_vertexAmount = new NumberInput().init(
+            div_vertexAmount,
+            'vertexAmount',
+            'Число вершин (три и более)',
+            3, Infinity,
+            3,
+            function(value) {
+                if (value == 4 && CurState.polygonType == convexPolygonName) {
+                    if (!checkbox_regular.isChecked()) {
+                        show(div_rectangleTypes);
+                    }
+                    enableButtons();
+                    checkRadioButton(radioButton_randomRectangle);
+                }
+            },
+            function() {
+                disableButtons();
+            },
+            function() {
+                hide(div_rectangleTypes);
+                enableButtons();
+            }
+        );
+    CurState.input_vertexAmount = input_vertexAmount;
+
+    // Степень невыпуклости --------------------------------------------------------------------------------------------|
+
+    var div_nonConvexityDegreeBlock = $('div#nonConvexityDegreeBlock');
+    var div_nonConvexityDegree = $('div#nonConvexityDegreeOption');
+    var radioButtons_nonConvexityDegree = new RadioButton().init(
+        div_nonConvexityDegreeBlock.find('div.option').first(),
+        'nonConvexityOption',
+        [
+            {
+                value: 'randomDegree',
+                label: 'любой',
+                onCheck: function() {
+                    hide(div_nonConvexityDegree);
+                }
+            },
+            {
+                value: 'definedDegree',
+                label: 'указать степень невыпуклости',
+                onCheck: function() {
+                    show(div_nonConvexityDegree)
+                }
+            }
+        ],
+        'randomDegree'
+    );
+
+    hide(div_nonConvexityDegreeBlock);
+    hide(div_nonConvexityDegree);
+
+    var radioButton_definedNonConvexityDegree = radioButtons_nonConvexityDegree.$elems['definedDegree'];
+    var input_nonConvexityDegree = new NumberInput().init(
+        div_nonConvexityDegree,
+        'nonConvexityDegree',
+        'Угол в градусах (от 0 до 180)',
+        0, 180,
+        45,
+        null,
+        disableButtons,
+        enableButtons
+    );
+    CurState.input_nonConvexityDegree = input_nonConvexityDegree;
+
+    // Показать номера вершин ------------------------------------------------------------------------------------------|
+
+    var checkbox_showVertexNumbers = new Checkbox().init(
+        $('div#vertexNumbersOption'),
+        'withNumbers',
+        'Показывать номера вершин',
+        CheckboxState.CHECKED,
+        function() {
+            if (CurState.polygon != undefined) {
+                canvas.redraw();
+            }
+        }
+    );
+    CurState.checkbox_showVertexNumbers = checkbox_showVertexNumbers;
 
     // Скрыть/показать опции сохранения --------------------------------------------------------------------------------|
 
@@ -360,143 +359,100 @@ $(document).ready(function() {
         }
     });
 
-    // Количество многоугольников --------------------------------------------------------------------------------------|
+    // Имя файла для сохранения ----------------------------------------------------------------------------------------|
 
-    var option_polygonAmount = $('div#polygonAmountOption'),
-        input_polygonAmount = $('input[name = polygonAmount]'),
-        polygonAmountError = false;
+    var input_fileName = new TextInput().init(
+        $('div#fileNameOption'),
+        'fileName',
+        'Имя файла',
+        Infinity,
+        Config.polygonFileName
+    );
 
-    input_polygonAmount.val(1);
+    // Количество многоугольников для сохранения -----------------------------------------------------------------------|
 
-    input_polygonAmount.keyup(function() {
-        polygonAmountChangeHandler(input_polygonAmount.val());
-    });
-    input_polygonAmount.change(function() {
-        polygonAmountChangeHandler(input_polygonAmount.val());
-    });
     var polygonAmountChangeHandler = function(value) {
-        if (value < 1) {
-            button_save.disable();
-            error(option_polygonAmount);
-            polygonAmountError = true;
+        if (value > 1) {
+            enableOneFile();
+            show(div_fileAmountOption);
+            checkbox_image.setLabel("С картинками");
         }
-        else {
-            button_save.enable();
-            unError(option_polygonAmount);
-            polygonAmountError = false;
-            if (value > 1) {
-                enableOneFile();
-                enable(div_manyFiles);
-                imageOptionLabel.text("С картинками");
-            }
-            else if (value == 1) {
-                checkRadioButton(radioButton_oneFile);
-                fileNameLabel.text("Имя файла");
-                disable(div_oneFile);
-                disable(div_manyFiles);
-                imageOptionLabel.text("С картинкой");
-            }
+        else if (value == 1) {
+            checkRadioButton(radioButton_oneFile);
+            input_fileName.setLabel("Имя файла");
+            hide(div_fileAmountOption);
+            checkbox_image.setLabel("С картинкой");
         }
     };
+    var div_polygonAmountOption = $('div#polygonAmountOption');
+    var input_polygonAmount = new NumberInput().init(
+        div_polygonAmountOption,
+        'polygonAmount',
+        'Количество многоугольников',
+        1, Infinity,
+        1,
+        polygonAmountChangeHandler,
+        function() {
+            button_save.disable();
+        },
+        function() {
+            button_save.enable();
+        }
+    );
+    CurState.input_polygonAmount = input_polygonAmount;
 
     // С картинками или без --------------------------------------------------------------------------------------------|
 
-    var checkbox_image = $('input[name = imageCheck]'),
-        imageOptionLabel = $('#imageOptionLabel');
-
-    checkCheckBox(checkbox_image);
-    imageOptionLabel.text("С картинкой");
+    var checkbox_image = new Checkbox().init(
+        $('div#imageOption'),
+        'imageCheck',
+        'С картинкой',
+        CheckboxState.CHECKED
+    );
+    CurState.checkbox_image = checkbox_image;
 
     // В один файл или в разные ----------------------------------------------------------------------------------------|
 
-    var div_oneFile = $('div#oneFileOption'),
+    var div_fileAmountOption = $('div#fileAmountOption'),
+        div_oneFile = $('div#oneFileOption'),
         div_manyFiles = $('div#manyFilesOption'),
+        radioButtons_filesAmount = new RadioButton().init(
+            div_fileAmountOption,
+            'fileAmountOption',
+            [
+                {
+                    value: 'oneFile',
+                    label: 'в один файл',
+                    onCheck: function() {
+                        input_fileName.setLabel("Имя файла");
+                    }
+                },
+                {
+                    value: 'manyFiles',
+                    label: 'в разные файлы',
+                    onCheck: function() {
+                        input_fileName.setLabel("Префикс имён файлов");
+                    }
+                }
+            ]
+        ),
         radioButton_oneFile = $('input[value = oneFile]'),
         radioButton_manyFiles = $('input[value = manyFiles]'),
-        fileNameLabel = $('#fileNameLabel'),
         enableOneFile = function() {
-            enable(div_oneFile);
+            show(div_oneFile);
             checkRadioButton(radioButton_oneFile);
         };
+    CurState.radioButtons_filesAmount = radioButtons_filesAmount;
 
-    fileNameLabel.text("Имя файла");
+    hide(div_fileAmountOption);
+    checkRadioButton(radioButton_oneFile);
 
-    radioButton_oneFile.change(function() {
-        if ($(this).prop('checked')) {
-            fileNameLabel.text("Имя файла");
-        }
-    });
-    radioButton_manyFiles.change(function() {
-        if ($(this).prop('checked')) {
-            fileNameLabel.text("Префикс имён файлов");
-        }
-    });
-
-    // Имя файла для сохранения ----------------------------------------------------------------------------------------|
-
-    var input_fileName = $('input[name = fileName]');
-
-    input_fileName.val(Config.polygonFileName);
-
-    // Кнопка "Сохранить" ----------------------------------------------------------------------------------------------|
-
-    button_save.$elem.click(function() {
-
-        var n = input_polygonAmount.val(),
-            name = input_fileName.val();
-
-        if (name == "") {
-            name = Config.polygonFileName;
-        }
-        if (currentVertexes.length == 0) {
-            generateAndDrawPolygon();
-        }
-        if (n == 1) {
-            savePolygons([currentVertexes], name, name);
-        }
-        else {
-            if (isChecked(radioButton_manyFiles)) {
-                if (currentVertexes.length == 0) {
-                    generateAndDrawPolygon();
-                }
-                savePolygons([currentVertexes], name + "1", name + "1");
-                for (var i = 2; i <= n; i++) {
-                    generateAndDrawPolygon();
-                    savePolygons([currentVertexes], name + i, name + i);
-                }
-            }
-            else {
-                if (currentVertexes.length == 0) {
-                    generateAndDrawPolygon();
-                }
-                var polygonList = [currentVertexes];
-                for (i = 1; i < n; i++) {
-                    if (isChecked(checkbox_image)) {
-                        canvas.toBlob(function(blob) {
-                            saveAs(blob, name + i);
-                        });
-                    }
-                    generateAndDrawPolygon();
-                    polygonList.push(currentVertexes);
-                }
-                savePolygons(polygonList, name, name + n);
-            }
-        }
-    });
-
-    var savePolygons = function(polygonList, txtName, pngName) {
-            IO.writeToSingleFile(polygonList, txtName + ".txt");
-            if (checkbox_image.prop('checked')) {
-                canvas.toBlob(function(blob) {
-                    saveAs(blob, pngName + ".png");
-                });
-            }
-        };
+    // Примеры многоугольников -----------------------------------------------------------------------------------------|
 
     example = function(polygonExample) {
-        currentVertexes = Example.build(polygonExample);
-        currentPolygon = Example;
-        infoTable.update(currentPolygon);
+        CurState.polygon = Example;
+        CurState.vertexes = Example.build(polygonExample);
+        CurState.infoTable.update(CurState.polygon);
     };
 
     exampleBisector = function() {
@@ -530,13 +486,13 @@ $(document).ready(function() {
         Example.acTestThreeVertexes();
         currentVertexes = Example.vertexes;
         currentPolygon = Example;
-        infoTable.update(currentPolygon);
+        CurState.infoTable.update(currentPolygon);
     };
     acTestTwoSidesAndVertex = function() {
         Example.acTestTwoSidesAndVertex();
         currentVertexes = Example.vertexes;
         currentPolygon = Example;
-        infoTable.update(currentPolygon);
+        CurState.infoTable.update(currentPolygon);
     };
 });
 
