@@ -323,14 +323,6 @@ var BasePolygon = (function() {
                 }
                 return false;
             };
-            var pickResWithMaxAlpha = function(r1, r2, r3) {
-                var a1 = r1.alpha;
-                var a2 = r2.alpha;
-                var a3 = r3.alpha;
-                return (a1 > a2) ?
-                    (a1 > a3) ? r1 : r3 :
-                    (a2 > a3) ? r2 : r3;
-            };
             //Метод предназначен для сегмента, концы которого являются вершинами
             var checkBestPointForSegment = function(seg, msg) {
                 var x = seg.getCenter();
@@ -419,10 +411,9 @@ var BasePolygon = (function() {
                         //сер. перп. в теругольнике пересекаются в одной точке => достаточно рассмотреть одну пару
                         x = G.getIntersection(abLine, bcLine);
                         if (x != null && G.isPointAtDistanceToPolygon(x, G.dist(x, a), this.vertexes)) {
-                            var abRes = new Res(a, b, x, abLine);
-                            var bcRes = new Res(b, c, x, bcLine);
-                            var acRes = new Res(a, c, x, acLine);
-                            updateRes(pickResWithMaxAlpha(abRes, bcRes, acRes), "3 vertexes");
+                            updateRes(new Res(a, b, x, abLine), "3 vertexes");
+                            updateRes(new Res(b, c, x, bcLine), "3 vertexes");
+                            updateRes(new Res(a, c, x, acLine), "3 vertexes");
                         }
                     }
                     //2 вершины и сторона
@@ -439,10 +430,9 @@ var BasePolygon = (function() {
                                     cLine,
                                     new Line(x, x.getShiftedByVector(cLine.getNormalVector()))
                                 );
-                                var res1 = new Res(a, h, x, abLine, parabola1);
-                                var res2 = new Res(b, h, x, abLine, parabola1);
-                                var res3 = new Res(a, b, x, abLine, parabola1);
-                                updateRes(pickResWithMaxAlpha(res1, res2, res3), "2 vertexes and side");
+                                updateRes(new Res(a, h, x, abLine, parabola1), "2 vertexes and side");
+                                updateRes(new Res(b, h, x, abLine, parabola1), "2 vertexes and side");
+                                updateRes(new Res(a, b, x, abLine, parabola1), "2 vertexes and side");
                             }
                             parabola1 = getPieceForPeakSide(peaks[j], c);
                             //new Parabola(peaks[j].vertex, new Line(c.a, c.b));
@@ -466,10 +456,19 @@ var BasePolygon = (function() {
                                     c.getLine(),
                                     new Line(x, x.getShiftedByVector(c.getLine().getNormalVector()))
                                 );
-                                res1 = new Res(hb, hc, x, bisector, parabola);
-                                res2 = new Res(hb, a, x, bisector, parabola);
-                                res3 = new Res(hc, a, x, bisector, parabola);
-                                updateRes(pickResWithMaxAlpha(res1, res2, res3), "vertex and 2 sides");
+                                if (b.isPointOn(hb)) {
+                                    if (c.isPointOn(hc)) {
+                                        updateRes(new Res(hb, hc, x, bisector, parabola), "vertex and 2 sides");
+                                        updateRes(new Res(hb, a, x, bisector, parabola), "vertex and 2 sides");
+                                        updateRes(new Res(hc, a, x, bisector, parabola), "vertex and 2 sides");
+                                    }
+                                    else {
+                                        updateRes(new Res(hb, a, x, bisector, parabola), "vertex and 2 sides");
+                                    }
+                                }
+                                else if (c.isPointOn(hc)) {
+                                    updateRes(new Res(hc, a, x, bisector, parabola), "vertex and 2 sides");
+                                }
                             }
                         };
                         if (bisectorPiece && !Type.isPoint(bisectorPiece) && !areSidesNeighbours(b, c)) {

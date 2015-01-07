@@ -63,11 +63,6 @@ var TestAlphaConvexity = {
                 throw new Error("Ошибка в Example.random2, биссектриса угла 4-5-0 должна давать угол 2.7340");
             }
 
-            acTestThreeVertexes();
-            if (Math.abs(Example.alphaConvexity - Math.PI) >= Config.alphaConvexityEps) {
-                throw new Error("Случай с двумя вершинами")
-            }
-
             this.logSuccess(testName);
         } catch (whatsWrong) {
             this.logFailure(testName, whatsWrong);

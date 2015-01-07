@@ -191,6 +191,13 @@ var Drawing = (function() {
             c.quadraticCurveTo(controlPoint.x, controlPoint.y, p2.x, p2.y);
             c.stroke();
         },
+        drawParabolicSegment: function(parabolicSeg, color, context) {
+            var c = context || this.c;
+            var parabola = parabolicSeg.parabola;
+            this.drawPoint(parabolicSeg.a, "#ff0", 2, c);
+            this.drawPoint(parabolicSeg.b, "#ff0", 2, c);
+            this.drawParabola(parabola, color, context);
+        },
         draw: function(shape, color, context) {
             var c = context || this.c;
             if (Type.isLine(shape)) {
@@ -204,6 +211,9 @@ var Drawing = (function() {
             }
             else if (Type.isSegment(shape)) {
                 this.drawSegment(shape, color, c);
+            }
+            else if (Type.isParabolicSegment(shape)) {
+                this.drawParabolicSegment(shape, color, c);
             }
         }
     }
