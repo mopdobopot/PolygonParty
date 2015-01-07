@@ -22,19 +22,23 @@ function RadioButton() {
                     '</div>'
                 );
                 this.$elems[val] = $container.find('input[value=' + val + ']');
-                this.$elems[val]['onCheck'] = radios[i].onCheck;
-                this.$elems[val]['onUnCheck'] = radios[i].onUnCheck;
                 var _this = this;
-                this.$elems[val].change(function() {
-                    if ($(this).prop('checked')) {
-                        _this.$elems[$(this).prop('value')].onCheck();
-                    }
-                });
-                this.$elems[val].change(function() {
-                    if (!$(this).prop('checked')) {
-                        _this.$elems[$(this).prop('value')].onUnCheck();
-                    }
-                })
+                if (radios[i].onCheck) {
+                    this.$elems[val]['onCheck'] = radios[i].onCheck;
+                    this.$elems[val].change(function() {
+                        if ($(this).prop('checked')) {
+                            _this.$elems[$(this).prop('value')].onCheck();
+                        }
+                    });
+                }
+                if (radios[i].onUnCheck) {
+                    this.$elems[val]['onUnCheck'] = radios[i].onUnCheck;
+                    this.$elems[val].change(function() {
+                        if (!$(this).prop('checked')) {
+                            _this.$elems[$(this).prop('value')].onUnCheck();
+                        }
+                    })
+                }
             }
             this.name = name;
             this.radios = radios;
