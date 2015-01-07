@@ -254,7 +254,7 @@ var G = (function() {
             return this.getNormalToLineContainsSegment(c, p1, p2);
         },
 
-        isPointAtDistanceToPolygon: function(p, dist, vertexes) {     //todo перенести в Geometry
+        isPointAtDistanceToPolygon: function(p, dist, vertexes) {
             return !this.isPointInPolygon(p, vertexes) && Math.abs(this.distToPolygon(p, vertexes) - dist) <= Config.eps;
         },
 

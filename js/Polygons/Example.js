@@ -118,36 +118,17 @@ var Example = {
         [388, 324],
         [448, 186]
     ],
-    acTestThreeVertexes: function() {
-        this.dropVertexes();
-        this.addVertex(new Point(100, 100));
-        this.addVertex(new Point(400, 100));
-        this.addVertex(new Point(400, 400));
-        this.addVertex(new Point(100, 400));
-        this.addVertex(new Point(200, 230));
-        this.addVertex(new Point(250, 350));
-        this.addVertex(new Point(320, 220));
-        this.addVertex(new Point(240, 200));
-        this.addVertex(new Point(300, 180));
-        this.addVertex(new Point(200, 130));
-        this.addVertex(new Point(200, 170));
-        this.centerAndDraw(720, 500, Drawing.c, true);
-        return this.vertexes;
-    },
-    acTestTwoSidesAndVertex: function() {
-        this.dropVertexes();
-        this.addVertex(new Point(0, 0));
-        this.addVertex(new Point(400, 0));
-        this.addVertex(new Point(240, 80));
-        this.addVertex(new Point(160, 160));
-        this.addVertex(new Point(160, 80));
-        this.addVertex(new Point(50, 80));
-        this.addVertex(new Point(50, 400));
-        this.addVertex(new Point(160, 400));
-        this.addVertex(new Point(160, 480));
-        this.addVertex(new Point(0, 480));
-        this.centerAndDraw(720, 500, Drawing.c, true);
-        return this.vertexes;
-    }
+    acTestTwoSidesAndVertex: [
+        [0, 0],
+        [400, 0],
+        [240, 80],
+        [160, 160],
+        [160, 80],
+        [50, 80],
+        [50, 400],
+        [160, 400],
+        [160, 480],
+        [0, 480]
+    ]
 };
 Example.__proto__ = BasePolygon;

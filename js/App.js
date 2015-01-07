@@ -482,17 +482,8 @@ $(document).ready(function() {
     exampleThreeSides = function() {
         example(Example.threeSides);
     };
-    acTestThreeVertexes = function() {
-        Example.acTestThreeVertexes();
-        currentVertexes = Example.vertexes;
-        currentPolygon = Example;
-        CurState.infoTable.update(currentPolygon);
-    };
-    acTestTwoSidesAndVertex = function() {
-        Example.acTestTwoSidesAndVertex();
-        currentVertexes = Example.vertexes;
-        currentPolygon = Example;
-        CurState.infoTable.update(currentPolygon);
+    exampleTwoSidesAndVertex = function() {
+        example(Example.acTestTwoSidesAndVertex);
     };
 });
 
