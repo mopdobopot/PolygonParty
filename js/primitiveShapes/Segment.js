@@ -127,5 +127,8 @@ function Segment(p1, p2) {
             return this.isPointOn(intersec) && segment.isPointOn(intersec) ? intersec
                                                                            : null;
         }
+    };
+    this.toString = function() {
+        return this.a.index + "-" + this.b.index;
     }
 }

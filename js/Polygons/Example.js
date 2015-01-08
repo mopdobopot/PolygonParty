@@ -118,7 +118,7 @@ var Example = {
         [388, 324],
         [448, 186]
     ],
-    acTestTwoSidesAndVertex: [
+    twoSidesAndVertex: [
         [0, 0],
         [400, 0],
         [240, 80],

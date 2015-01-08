@@ -287,14 +287,15 @@ var BasePolygon = (function() {
             var a, b, c, ab, bc, ac, abLine, bcLine, acLine, x, parabola1, parabola2, finalRes = new Res();
             finalRes.alpha = 0;
             var _thisref = this;
-            function Res(a, b, x, line, line2) {
+            function Res(a, b, x, line1, line2, line3) {
                 this.x = x;
                 this.a = a;
                 this.b = b;
                 this.seg1 = (x != null && a != null) ? new Segment(x, a) : null;
                 this.seg2 = (x != null && b != null) ? new Segment(x, b) : null;
-                this.line = line;
+                this.line1 = line1;
                 this.line2 = line2;
+                this.line3 = line3;
                 this.alpha = (this.seg1 != null && this.seg2 != null)
                     ? this.seg1.getDirectingVector().getMinAlpha(this.seg2.getDirectingVector())
                     : null;
@@ -305,8 +306,9 @@ var BasePolygon = (function() {
                 if (finalRes.alpha) {
                     Drawing.draw(finalRes.seg1, color1);
                     Drawing.draw(finalRes.seg2, color1);
-                    if (finalRes.line) Drawing.draw(finalRes.line, color2);
+                    if (finalRes.line1) Drawing.draw(finalRes.line1, color2);
                     if (finalRes.line2) Drawing.draw(finalRes.line2, color2);
+                    if (finalRes.line3) Drawing.draw(finalRes.line3, color2);
                     if (finalRes.x)
                         Drawing.drawAngleSign(
                             finalRes.seg1.getDirectingVector(),
@@ -334,10 +336,11 @@ var BasePolygon = (function() {
                             x,
                             seg.getCentralPerpendicular()
                         ),
-                        msg || "best point (center of segment) for 2 vertexes");
+                        msg || "best point (center of segment) for two vertexes: " + seg.a.index + " and " + seg.b.index
+                    );
                 }
             };
-            var checkBestPointForParabola = function(parabola, directrixSeg, msg) {
+            var checkBestPointForParabola = function(parabola, directrixSeg, peak, msg) {
                 if (parabola != null) {
                     if (Type.isParabolicBeam(parabola) ||
                         Type.isParabolicSegment(parabola)) {
@@ -353,7 +356,9 @@ var BasePolygon = (function() {
                                 parabola.vertex,
                                 parabola
                             ),
-                            msg || "best point (parabola's vertex) for vertex and side");
+                            msg || "best point (parabola's vertex) for vertex " + peak.vertex.index +
+                            " and side " + directrixSeg.toString()
+                        );
                     }
                 }
             };
@@ -374,7 +379,7 @@ var BasePolygon = (function() {
                                 x,
                                 biseg
                             ),
-                            msg || "any point on bisector of 2 sides"
+                            msg || "any point on bisector of two sides: " + side1.toString() + " and " + side2.toString()
                         )
                     }
                 }
@@ -411,9 +416,10 @@ var BasePolygon = (function() {
                         //сер. перп. в теругольнике пересекаются в одной точке => достаточно рассмотреть одну пару
                         x = G.getIntersection(abLine, bcLine);
                         if (x != null && G.isPointAtDistanceToPolygon(x, G.dist(x, a), this.vertexes)) {
-                            updateRes(new Res(a, b, x, abLine), "3 vertexes");
-                            updateRes(new Res(b, c, x, bcLine), "3 vertexes");
-                            updateRes(new Res(a, c, x, acLine), "3 vertexes");
+                            var msg = "three vertexes: " + a.index + ", " + b.index + " and " + c.index;
+                            updateRes(new Res(a, b, x, abLine), msg);
+                            updateRes(new Res(b, c, x, bcLine), msg);
+                            updateRes(new Res(a, c, x, acLine), msg);
                         }
                     }
                     //2 вершины и сторона
@@ -422,21 +428,20 @@ var BasePolygon = (function() {
                         if (!c.getLine().isPointOn(a) && !c.getLine().isPointOn(b)) {
                             var cLine = c.getLine();
                             parabola1 = getPieceForPeakSide(peaks[i], c);
-                            //new Parabola(peaks[i].vertex, new Line(c.a, c.b));
-                            checkBestPointForParabola(parabola1, c);
+                            checkBestPointForParabola(parabola1, c, peaks[i]);
                             x = G.getIntersection(abLine, parabola1);
                             if (x != null && G.isPointAtDistanceToPolygon(x, G.dist(x, a), _thisref.vertexes)) {
                                 var h = G.getIntersection(
                                     cLine,
                                     new Line(x, x.getShiftedByVector(cLine.getNormalVector()))
                                 );
-                                updateRes(new Res(a, h, x, abLine, parabola1), "2 vertexes and side");
-                                updateRes(new Res(b, h, x, abLine, parabola1), "2 vertexes and side");
-                                updateRes(new Res(a, b, x, abLine, parabola1), "2 vertexes and side");
+                                msg = "two vertexes: " + a.index + ", " + b.index + " and side: " + c.toString();
+                                updateRes(new Res(a, h, x, abLine, parabola1), msg);
+                                updateRes(new Res(b, h, x, abLine, parabola1), msg);
+                                updateRes(new Res(a, b, x, abLine, parabola1), msg);
                             }
                             parabola1 = getPieceForPeakSide(peaks[j], c);
-                            //new Parabola(peaks[j].vertex, new Line(c.a, c.b));
-                            checkBestPointForParabola(parabola1, c);
+                            checkBestPointForParabola(parabola1, c, peaks[j]);
                         }
                     }
                 }
@@ -456,18 +461,19 @@ var BasePolygon = (function() {
                                     c.getLine(),
                                     new Line(x, x.getShiftedByVector(c.getLine().getNormalVector()))
                                 );
+                                msg = "vertex " + a.index + " and two sides: " + b.toString() + " and " + c.toString();
                                 if (b.isPointOn(hb)) {
                                     if (c.isPointOn(hc)) {
-                                        updateRes(new Res(hb, hc, x, bisector, parabola), "vertex and 2 sides");
-                                        updateRes(new Res(hb, a, x, bisector, parabola), "vertex and 2 sides");
-                                        updateRes(new Res(hc, a, x, bisector, parabola), "vertex and 2 sides");
+                                        updateRes(new Res(hb, hc, x, bisector, parabola), msg);
+                                        updateRes(new Res(hb, a, x, bisector, parabola), msg);
+                                        updateRes(new Res(hc, a, x, bisector, parabola), msg);
                                     }
                                     else {
-                                        updateRes(new Res(hb, a, x, bisector, parabola), "vertex and 2 sides");
+                                        updateRes(new Res(hb, a, x, bisector, parabola), msg);
                                     }
                                 }
                                 else if (c.isPointOn(hc)) {
-                                    updateRes(new Res(hc, a, x, bisector, parabola), "vertex and 2 sides");
+                                    updateRes(new Res(hc, a, x, bisector, parabola), msg);
                                 }
                             }
                         };
@@ -475,8 +481,7 @@ var BasePolygon = (function() {
                             var bisector = bisectorPiece.getLine();
                             if (!b.getLine().isPointOn(a)) {
                                 parabola1 = getPieceForPeakSide(peaks[i], b);
-                                //new Parabola(peaks[i].vertex, new Line(b.a, b.b));
-                                checkBestPointForParabola(parabola1, b);
+                                checkBestPointForParabola(parabola1, b, peaks[i]);
                                 x = G.getIntersection(bisector, parabola1);
                                 if (x) {
                                     for (var z = 0; z < x.pointAmount; z++) {
@@ -486,8 +491,7 @@ var BasePolygon = (function() {
                             }
                             if (!c.getLine().isPointOn(a)) {
                                 parabola1 = getPieceForPeakSide(peaks[i], c);
-                                //new Parabola(peaks[i].vertex, new Line(c.a, c.b));
-                                checkBestPointForParabola(parabola1, c);
+                                checkBestPointForParabola(parabola1, c, peaks[i]);
                                 x = G.getIntersection(bisector, parabola1);
                                 if (x) {
                                     for (z = 0; z < x.pointAmount; z++) {
@@ -512,15 +516,41 @@ var BasePolygon = (function() {
                         checkBestPointForBisector(biSeg2, b, c);
                         var biSeg3 = getPieceForSideSide(c, a);
                         checkBestPointForBisector(biSeg3, c, a);
-                        if (biSeg1 && biSeg2) {
-                            x = G.getIntersection(biSeg1, biSeg2);
+                        if (biSeg1 && biSeg2 || biSeg1 && biSeg3 || biSeg2 && biSeg3) {
+                            if (biSeg1 && biSeg2) {
+                                x = G.getIntersection(biSeg1, biSeg2);
+                            }
+                            else if (biSeg1 && biSeg3) {
+                                x = G.getIntersection(biSeg1, biSeg3);
+                            }
+                            else {
+                                x = G.getIntersection(biSeg2, biSeg3);
+                            }
                             if (Type.isPoint(x)) {
-                                var l1 = new Line(x, x.getShiftedByVector(a.getLine().getNormalVector()));
-                                var h1 = G.getIntersection(l1, a);
-                                var l2 = new Line(x, x.getShiftedByVector(c.getLine().getNormalVector()));
-                                var h2 = G.getIntersection(l2, c);
-                                var res = new Res(h1, h2, x, biSeg1, biSeg2);
-                                updateRes(res, "3 sides");
+                                var la = new Line(x, x.getShiftedByVector(a.getLine().getNormalVector()));
+                                var ha = G.getIntersection(la, a);
+                                var lb = new Line(x, x.getShiftedByVector(b.getLine().getNormalVector()));
+                                var hb = G.getIntersection(lb, b);
+                                var lc = new Line(x, x.getShiftedByVector(c.getLine().getNormalVector()));
+                                var hc = G.getIntersection(lc, c);
+                                msg = "three sides: " + a.toString() + ", " + b.toString() + " and " + c.toString();
+                                if (G.isPointAtDistanceToPolygon(x, G.dist(x, ha), this.vertexes)) {
+                                    if (ha) {
+                                        if (hb) {
+                                            updateRes(new Res(ha, hb, x, biSeg1, biSeg2, biSeg3), msg);
+                                            if (hc) {
+                                                updateRes(new Res(ha, hc, x, biSeg1, biSeg2, biSeg3), msg);
+                                                updateRes(new Res(hb, hc, x, biSeg1, biSeg2, biSeg3), msg);
+                                            }
+                                        }
+                                        else if (hc) {
+                                            updateRes(new Res(ha, hc, x, biSeg1, biSeg2, biSeg3), msg);
+                                        }
+                                    }
+                                    else if (hb && hc) {
+                                        updateRes(new Res(hb, hc, x, biSeg1, biSeg2, biSeg3), msg);
+                                    }
+                                }
                             }
                         }
                     }

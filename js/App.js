@@ -483,7 +483,7 @@ $(document).ready(function() {
         example(Example.threeSides);
     };
     exampleTwoSidesAndVertex = function() {
-        example(Example.acTestTwoSidesAndVertex);
+        example(Example.twoSidesAndVertex);
     };
 });
 
