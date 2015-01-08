@@ -37,8 +37,10 @@ var StarPolygon = (function() {
                 v2 = new Vector(p2, p3),
                 alpha = v1.getAlpha(v2);
             if (alpha < phi - Config.stretchingEps) {
-                console.log("вершина " + j);
-                console.log("старый угол: " + alpha);
+                if (Config.debugConsole) {
+                    console.log("вершина " + j);
+                    console.log("старый угол: " + alpha);
+                }
                 vertexes[j] = stretchVertex(p1, p2, p3, phi);
                 if (j === 0) {
                     tryStretch(l - 2, l - 1, 0, phi, vertexes);
@@ -74,7 +76,7 @@ var StarPolygon = (function() {
                 v2 = new Vector(p2, p3);
                 alpha = v1.getAlpha(v2);
             }
-            console.log("новый угол: " + alpha + "\n");
+            if (Config.debugConsole) console.log("новый угол: " + alpha + "\n");
             return p2;
         };
 

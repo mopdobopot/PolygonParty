@@ -5,6 +5,7 @@
  */
 var Config = {
     debugDrawing: false,
+    debugConsole: true,
 
     polygonFileName: "p",
 
@@ -19,7 +20,7 @@ var Config = {
 
     eps: 0.00001,
     zeroPointEps: 0.0000001,
-    //Точность, с которой точка считается лежащей на параболе
+    //Точность для вычисления принадлежности точки параболе
     pointOnParabolaEps: 0.0001,
     quadraticEquationEps: 10e-7,
     //Угол, примерно равный 0.06 градуса, считается за 0 при определении сонаправленности векторов
@@ -31,5 +32,5 @@ var Config = {
     linesParallelEps: this.eps,
 
     //Точность вычисления альфа-выпуклости
-    alphaConvexityEps: 0.01
+    alphaConvexityEps: 1e-4
 };

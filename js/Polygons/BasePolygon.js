@@ -336,7 +336,7 @@ var BasePolygon = (function() {
                             x,
                             seg.getCentralPerpendicular()
                         ),
-                        msg || "best point (center of segment) for two vertexes: " + seg.a.index + " and " + seg.b.index
+                        msg || "best point (center of segment) for two vertexes: «" + seg.a.index + "» and «" + seg.b.index + "»"
                     );
                 }
             };
@@ -356,8 +356,8 @@ var BasePolygon = (function() {
                                 parabola.vertex,
                                 parabola
                             ),
-                            msg || "best point (parabola's vertex) for vertex " + peak.vertex.index +
-                            " and side " + directrixSeg.toString()
+                            msg || "best point (parabola's vertex) for vertex «" + peak.vertex.index +
+                            "» and side «" + directrixSeg.toString() + "»"
                         );
                     }
                 }
@@ -379,7 +379,7 @@ var BasePolygon = (function() {
                                 x,
                                 biseg
                             ),
-                            msg || "any point on bisector of two sides: " + side1.toString() + " and " + side2.toString()
+                            msg || "any point on bisector of two sides: «" + side1.toString() + "» and «" + side2.toString() + "»"
                         )
                     }
                 }
@@ -395,6 +395,7 @@ var BasePolygon = (function() {
                     return false;
                 }
             };
+            if (Config.debugConsole) console.time('Alpha-convexity');
             //Вершины
             for (var i = 0; i < peaks.length - 2; i++) {
                 a = peaks[i].vertex;
@@ -416,7 +417,7 @@ var BasePolygon = (function() {
                         //сер. перп. в теругольнике пересекаются в одной точке => достаточно рассмотреть одну пару
                         x = G.getIntersection(abLine, bcLine);
                         if (x != null && G.isPointAtDistanceToPolygon(x, G.dist(x, a), this.vertexes)) {
-                            var msg = "three vertexes: " + a.index + ", " + b.index + " and " + c.index;
+                            var msg = "three vertexes: «" + a.index + "», «" + b.index + "» and «" + c.index + "»";
                             updateRes(new Res(a, b, x, abLine), msg);
                             updateRes(new Res(b, c, x, bcLine), msg);
                             updateRes(new Res(a, c, x, acLine), msg);
@@ -435,7 +436,7 @@ var BasePolygon = (function() {
                                     cLine,
                                     new Line(x, x.getShiftedByVector(cLine.getNormalVector()))
                                 );
-                                msg = "two vertexes: " + a.index + ", " + b.index + " and side: " + c.toString();
+                                msg = "two vertexes: «" + a.index + "», «" + b.index + "» and side: «" + c.toString() + "»";
                                 updateRes(new Res(a, h, x, abLine, parabola1), msg);
                                 updateRes(new Res(b, h, x, abLine, parabola1), msg);
                                 updateRes(new Res(a, b, x, abLine, parabola1), msg);
@@ -461,7 +462,7 @@ var BasePolygon = (function() {
                                     c.getLine(),
                                     new Line(x, x.getShiftedByVector(c.getLine().getNormalVector()))
                                 );
-                                msg = "vertex " + a.index + " and two sides: " + b.toString() + " and " + c.toString();
+                                msg = "vertex «" + a.index + "» and two sides: «" + b.toString() + "» and «" + c.toString() + "»";
                                 if (b.isPointOn(hb)) {
                                     if (c.isPointOn(hc)) {
                                         updateRes(new Res(hb, hc, x, bisector, parabola), msg);
@@ -533,7 +534,7 @@ var BasePolygon = (function() {
                                 var hb = G.getIntersection(lb, b);
                                 var lc = new Line(x, x.getShiftedByVector(c.getLine().getNormalVector()));
                                 var hc = G.getIntersection(lc, c);
-                                msg = "three sides: " + a.toString() + ", " + b.toString() + " and " + c.toString();
+                                msg = "three sides: «" + a.toString() + "», «" + b.toString() + "» and «" + c.toString() + "»";
                                 if (G.isPointAtDistanceToPolygon(x, G.dist(x, ha), this.vertexes)) {
                                     if (ha) {
                                         if (hb) {
@@ -556,8 +557,9 @@ var BasePolygon = (function() {
                     }
                 }
             }
+            if (Config.debugConsole) console.timeEnd('Alpha-convexity');
             drawFinalRes();
-            if (finalRes.msg) {
+            if (Config.debugConsole && finalRes.msg) {
                 console.log(finalRes.msg);
             }
             this.alphaConvexity = finalRes.alpha;

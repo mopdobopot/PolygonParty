@@ -4,14 +4,10 @@
  * Time: 10:20
  */
 var BaseTest = {
-    eps: 10e-6,
     logFailure: function(testName, whatsWrong) {
         console.error("FAILURE:\t" + testName + ", " + whatsWrong);
     },
     logSuccess: function(testName) {
-        console.log("SUCCESS:\t" + testName);
-    },
-    assertEquals: function(a, b) {
-        return Math.abs(a - b) < this.eps;
+        console.info("SUCCESS:\t" + testName);
     }
 };
