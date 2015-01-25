@@ -18,17 +18,17 @@ var Config = {
     vertexRadius: 2.1,
     clickedVertexRadius: 1.6,
 
-    eps: 0.00001,
-    zeroPointEps: 0.0000001,
+    eps: 1e-5,
+    zeroPointEps: 1e-7,
     //Точность для вычисления принадлежности точки параболе
-    pointOnParabolaEps: 0.0001,
+    pointOnParabolaEps: 1e-5,
     quadraticEquationEps: 10e-7,
     //Угол, примерно равный 0.06 градуса, считается за 0 при определении сонаправленности векторов
-    sameDirectingEps: 0.001,
+    sameDirectingEps: 1e-3,
     //Точность "выпукливания" звёздчатого многоугольника
-    stretchingEps: 0.0000001,
+    stretchingEps: 1e-7,
     //Точность определения совпадения прямых
-    linesEqualsEps: 0.0001,
+    linesEqualsEps: 1e-5,
     linesParallelEps: this.eps,
 
     //Точность вычисления альфа-выпуклости
