@@ -458,6 +458,9 @@ $(document).ready(function() {
     exampleBisector = function() {
         example(Example.bisector);
     };
+    exampleBisector2 = function() {
+        example(Example.bisector2);
+    };
     exampleTwoVertexes = function() {
         example(Example.twoVertexes);
     };
