@@ -13,7 +13,7 @@ var IO = (function() {
             vertexes[i].x + ", " + vertexes[i].y +
             (i == vertexes.length - 1 ? "]\n" : "],\n");
         }
-        return ans += "]";
+        return ans += "]\n";
     };
 
     return {
